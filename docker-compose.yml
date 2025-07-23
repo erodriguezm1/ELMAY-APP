@@ -10,9 +10,12 @@ services:
     environment:
       NODE_ENV: development
       PORT: 5000
+      MONGO_URI: mongodb://admin:password@mongo:27017/ecommerce?authSource=admin
     volumes:
       - ./backend:/app
       - /app/node_modules
+    depends_on:
+      - mongo
 
   frontend:
     build: ./frontend
@@ -22,8 +25,24 @@ services:
     environment:
       NODE_ENV: development
       VITE_APP_API_URL: http://backend:5000/api
+    depends_on:
+      - backend
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    depends_on:
-      - backend
+      
+  # --- Servicio de la Base de Datos ---
+  mongo:
+    image: mongo:latest # Usaremos la última versión oficial de MongoDB
+    container_name: elmay-mongodb # Un nombre descriptivo para el contenedor
+    ports:
+      - "27017:27017" # Mapea el puerto de MongoDB a tu máquina local (opcional para acceso directo)
+    volumes:
+      - mongo-data:/data/db # **CRUCIAL:** Persistencia de datos para MongoDB
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin # Usuario raíz inicial
+      MONGO_INITDB_ROOT_PASSWORD: password # Contraseña raíz inicial (¡Cámbiala en producción!)
+
+# Volúmenes para persistencia de datos
+volumes:
+  mongo-data: # Define el volumen nombrado para MongoDB
