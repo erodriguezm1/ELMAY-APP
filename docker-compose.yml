@@ -1,49 +1,29 @@
 # ELMAY/docker-compose.yml
-version: '3.8' # Versión de la especificación de Docker Compose
+version: '3.8'
 
 services:
-  # --- Servicio del Backend ---
   backend:
-    build: ./backend # Le dice a Docker que busque el Dockerfile en la carpeta 'backend'
-    container_name: elmay-backend # Nombre fácil de identificar para el contenedor
+    build: ./backend
+    container_name: elmay-backend
     ports:
-      - "5000:5000" # Mapea el puerto 5000 de tu máquina al puerto 5000 del contenedor
+      - "5000:5000"
     environment:
       NODE_ENV: development
       PORT: 5000
-      # MONGO_URI: mongodb://mongo:27017/ecommerce # Si MongoDB corre en Docker
     volumes:
-      - ./backend:/app # Sincroniza la carpeta local 'backend' con '/app' en el contenedor
-      - /app/node_modules # Evita que los node_modules del contenedor se sobrescriban por el volumen local
+      - ./backend:/app
+      - /app/node_modules
 
-  # --- Servicio del Frontend ---
   frontend:
-    build: ./frontend # Le dice a Docker que busque el Dockerfile en la carpeta 'frontend'
-    container_name: elmay-frontend # Nombre fácil de identificar para el contenedor
+    build: ./frontend
+    container_name: elmay-frontend
     ports:
-      - "3000:3000" # Mapea el puerto 3000 de tu máquina al puerto 3000 del contenedor
+      - "3000:3000"
     environment:
       NODE_ENV: development
-      # Esta variable es CRUCIAL para que tu frontend sepa dónde encontrar tu API del backend
       VITE_APP_API_URL: http://backend:5000/api
     volumes:
-      - ./frontend:/app # Sincroniza la carpeta local 'frontend' con '/app' en el contenedor
-      - /app/node_modules # Evita que los node_modules del contenedor se sobrescriban por el volumen local
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
-      - backend # Asegura que el backend se inicie antes que el frontend
-
-  # --- Servicio de la Base de Datos (Opcional, si quieres MongoDB en un contenedor) ---
-  # mongo:
-  #   image: mongo:latest
-  #   container_name: elmay-mongodb
-  #   ports:
-  #     - "27017:27017" # Mapea el puerto de MongoDB
-  #   volumes:
-  #     - mongo-data:/data/db # Persistencia de datos para MongoDB
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: admin
-  #     MONGO_INITDB_ROOT_PASSWORD: password
-
-# Volúmenes para persistencia de datos (si usas MongoDB en Docker)
-# volumes:
-#   mongo-data:
+      - backend
