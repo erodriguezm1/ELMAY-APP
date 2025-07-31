@@ -2,6 +2,8 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import Home from './pages/Home'
+import Login from './pages/Login'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -28,8 +30,19 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <Router>
+        <div>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </div>
+      </Router>
     </>
   )
 }
+
+const Home = () => <h2>Home Page</h2>;
+const Login = () => <h2>Login Page</h2>;
 
 export default App
