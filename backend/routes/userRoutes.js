@@ -15,12 +15,12 @@ router.get('/profile', protect, (req, res) => {
   res.json({ message: `Welcome, ${req.user.username}!` });
 });
 
-// Nueva ruta protegida con autorización (solo para sellers)
+// Nueva ruta protegida con autorización (solo para sellers, y admins)
 router.get('/dashboard', protect, authorize('seller', 'admin'), (req, res) => {
   res.json({ message: `Welcome to the seller dashboard, ${req.user.username}!` });
 });
 
-// Nueva ruta protegida con autorización (solo para buyers)
+// Nueva ruta protegida con autorización (para todos los perfiles)
 router.get('/index', protect, authorize('buyer', 'seller', 'admin'), (req, res) => {
   res.json({ message: `Welcome to the buyer dashboard, ${req.user.username}!` });
 });
