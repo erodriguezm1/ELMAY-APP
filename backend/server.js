@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db'); // Importa la función de conexión
+const userRoutes = require('./routes/userRoutes');
 
 // Cargar variables de entorno
 dotenv.config();
@@ -13,11 +14,14 @@ const PORT = process.env.PORT || 5000; // El puerto del servidor, usa el de .env
 
 // Middleware para parsear JSON (para que Express entienda los datos JSON que le envíe el frontend)
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // Ruta de prueba
 app.get('/', (req, res) => {
   res.send('¡API de ELMAY funcionando!');
 });
+
+app.use('/api/users', userRoutes);
 
 // Iniciar el servidor
 app.listen(PORT, () => {
