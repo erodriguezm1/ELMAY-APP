@@ -1,10 +1,11 @@
 import React from 'react';
+import './Footer.css';
 
-function Home() {
+function Footer() {
   return (
         <h1>nobovi</h1>
 
   );
 }
 
-export default Home;
+export default Footer;

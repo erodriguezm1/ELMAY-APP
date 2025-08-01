@@ -5,15 +5,21 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 
+// Importa tus componentes universales (como Header y Footer)
+import Header from './components/Header.jsx';
+import Footer from './components/Footer.jsx';
+
 function App() {
   return (
     <Router>
+      <Header/>
       <div>
         <Routes>
           <Route path="/" element={<Home />} exact />
           <Route path="/login" element={<Login />} />
         </Routes>
       </div>
+      <Footer/>
     </Router>
   );
 }
