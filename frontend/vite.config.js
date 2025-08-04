@@ -7,5 +7,6 @@ export default defineConfig({
   server: {
     host: true, // Importante para Docker: el servidor escucha en todas las interfaces
     port: 3000, // Fuerza el puerto 3000
+    allowedHosts: ['elmay.redinterna.local'],
   }
 })

@@ -1,55 +1,55 @@
-# ELMAY/docker-compose.yml
+# ELMAY-APP/docker-compose.yml
 version: '3.8'
 
 services:
-  backend:
-    build: ./backend
-    container_name: elmay-backend
+  nginx:
+    image: nginx:latest
+    container_name: elmay-nginx
     ports:
-      - "5000:5000"
-    environment:
-      NODE_ENV: production
-      PORT: 5000
-      MONGO_URI: mongodb://admin:password@mongo:27017/ecommerce?authSource=admin
+      - "80:80"
     volumes:
-      - ./backend:/app
-      - /app/node_modules
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: elmay-backend
     env_file:
       - ./backend/.env
     depends_on:
       - mongo
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: elmay-frontend
-    ports:
-      - "3000:3000"
     environment:
-      NODE_ENV: production
-      VITE_APP_API_URL: http://backend:5000/api
+      - NODE_ENV=production
+      # La URL ahora es relativa, ya que Nginx es el proxy
+      - VITE_APP_API_URL=/api
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      
-  # --- Servicio de la Base de Datos ---
+
   mongo:
-    image: mongo:4.4 #latest Usaremos la última versión oficial de MongoDB
-    container_name: elmay-mongodb # Un nombre descriptivo para el contenedor
+    image: mongo:4.4
+    container_name: elmay-mongodb
     ports:
-      - "27017:27017" # Mapea el puerto de MongoDB a tu máquina local (opcional para acceso directo)
+      - "27017:27017"
     volumes:
-      - mongo-data:/data/db # **CRUCIAL:** Persistencia de datos para MongoDB
+      - mongo-data:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin # Usuario raíz inicial
-      MONGO_INITDB_ROOT_PASSWORD: password # Contraseña raíz inicial (¡Cámbiala en producción!)
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.runCommand({ping: 1})", "--quiet"]
       interval: 10s
       timeout: 10s
       retries: 5
 
-# Volúmenes para persistencia de datos
 volumes:
-  mongo-data: # Define el volumen nombrado para MongoDB
+  mongo-data:
