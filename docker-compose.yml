@@ -33,7 +33,7 @@ services:
       
   # --- Servicio de la Base de Datos ---
   mongo:
-    image: mongo:latest # Usaremos la última versión oficial de MongoDB
+    image: mongo:4.4 #latest Usaremos la última versión oficial de MongoDB
     container_name: elmay-mongodb # Un nombre descriptivo para el contenedor
     ports:
       - "27017:27017" # Mapea el puerto de MongoDB a tu máquina local (opcional para acceso directo)
@@ -42,6 +42,11 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin # Usuario raíz inicial
       MONGO_INITDB_ROOT_PASSWORD: password # Contraseña raíz inicial (¡Cámbiala en producción!)
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand({ping: 1})", "--quiet"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
 # Volúmenes para persistencia de datos
 volumes:
