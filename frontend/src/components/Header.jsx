@@ -12,9 +12,11 @@ function Header() {
 
 		<nav>
 			<ul>
-				<li><a href="#">Inicio</a></li>
+				<li><a href="/">Inicio</a></li>
 				<li><a href="#">Acerca de</a></li>
 				<li><a href="#">Contacto</a></li>
+				<li><a href="/login">Sing In</a></li>
+				<li><a href="/login">Cesta</a></li>
 			</ul>
 		</nav>
 

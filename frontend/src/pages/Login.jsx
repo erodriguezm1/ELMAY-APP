@@ -13,10 +13,26 @@ function Login() {
     password: '',
   });
 
+   // Estado para el formulario de REGISTRO
+  const [registerFormData, setRegisterFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    username: '', // Añadido para consistencia si tu backend lo requiere
+  });
+
   const { username, password } = formData;
+  const { name, email, password: registerPassword, username: registerUsername } = registerFormData; // Para el registro
 
   const onChange = (e) => {
     setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const onRegisterChange = (e) => {
+    setRegisterFormData((prevState) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
@@ -59,13 +75,13 @@ function Login() {
   const onRegisterSubmit = async (e) => {
     e.preventDefault();
     const userData = {
-      username,
+      name,
       email,
       password: registerPassword,
-      username: registerUsername, // Asegúrate de que tu backend espera 'username' para registro
+      username: registerUsername, 
     };
     try {
-      const response = await fetch('http://localhost:5000/api/users/register', { // <-- Asegúrate de que esta sea tu ruta de registro
+      const response = await fetch('http://localhost:5000/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +92,7 @@ function Login() {
         const data = await response.json();
         localStorage.setItem('user', JSON.stringify(data)); // Inicia sesión automáticamente después del registro
         console.log('Respuesta del backend (Registro):', data);
-        navigate('/');
+        navigate('#');
       } else {
         console.log('Error al registrar usuario:', response.statusText);
         // Aquí podrías añadir lógica para mostrar un mensaje de error al usuario
@@ -95,7 +111,7 @@ function Login() {
         id="container"
       >
         <div className="form-container sign-up-container">
-          <form action="#">
+          <form action="#" onSubmit={onRegisterSubmit}>
             <h1>Create Account</h1>
             <div className="social-container">
               <a href="#" className="social"><i className="fab fa-facebook-f"></i></a>
@@ -103,10 +119,39 @@ function Login() {
               <a href="#" className="social"><i className="fab fa-linkedin-in"></i></a>
             </div>
             <span>or use your email for registration</span>
-            <input type="text" placeholder="Name" />
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
-            <button>Sign Up</button>
+            <input 
+              type="text"
+              placeholder="Name"
+              name="name"
+              value={name}
+              onChange={onRegisterChange}
+              required
+            />
+            <input 
+              type="text" 
+              placeholder="UserName"
+              name="username"
+              value={registerUsername}
+              onChange={onRegisterChange}
+              required 
+            />
+            <input 
+              type="email" 
+              placeholder="Email" 
+              name="email"
+              value={email}
+              onChange={onRegisterChange}
+              required
+            />
+            <input 
+              type="password" 
+              placeholder="Password"
+              name="password"
+              value={registerPassword}
+              onChange={onRegisterChange}
+              required  
+            />
+            <button type="submit">Sign Up</button>
           </form>
         </div>
         <div className="form-container sign-in-container">
