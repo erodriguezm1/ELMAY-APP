@@ -5,7 +5,7 @@ const { registerUser, loginUser } = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 // La ruta POST /api/users ejecutará la función registerUser
-router.post('/', registerUser);
+router.post('/register', registerUser);
 
 // La nueva ruta POST /api/users/login
 router.post('/login', loginUser);
