@@ -1,62 +1,60 @@
+/* ELMAY-APP/frontend/src/components/Header.css */
 .main-header {
-	background: #333;
-	color: white;
-	height: 80px;
-}	
-	.main-header a {
-		color: white;
-	}
-
-/*
- * Logo
- */
+    background: #333;
+    color: white;
+    height: 80px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+    .main-header a, .main-header button {
+        color: white;
+    }
 .main-header .logo-header {
-	float: left;
-	padding: 15px 0 0 20px;
-	text-decoration: none;
+    text-decoration: none;
+    padding: 0;
 }
-	.main-header .logo-header:hover {
-		color: #0b76a6;
-	}
-	
-	.main-header .logo-header .site-name {
-		display: block;
-		font-weight: 700;
-		font-size: 1.2em;
-	}
-	
-	.main-header .logo-header .site-desc {
-		display: block;
-		font-weight: 300;
-		font-size: 0.8em;
-		color: #999;
-	}
-	
-
-/*
- * Navegación
- */
-.main-header nav {
-	float: right;
+    .main-header .logo-header:hover {
+        color: #0b76a6;
+    }
+    .main-header .logo-header .site-name {
+        display: block;
+        font-weight: 700;
+        font-size: 1.2em;
+    }
+    .main-header .logo-header .site-desc {
+        display: block;
+        font-weight: 300;
+        font-size: 0.8em;
+        color: #999;
+    }
+.main-header nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
 }
-	.main-header nav ul {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-		padding-right: 20px;
-	}
-	
-		.main-header nav ul li {
-			display: inline-block;
-			line-height: 80px;
-		}
-			
-			.main-header nav ul li a {
-				display: block;
-				padding: 0 10px;
-				text-decoration: none;
-			}
-			
-				.main-header nav ul li a:hover {
-					background: #0b76a6;
-				}
+    .main-header nav ul li {
+        line-height: 80px;
+    }
+        .main-header nav ul li a,
+        .main-header nav ul li button {
+            display: block;
+            padding: 0 10px;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            color: white;
+        }
+            .main-header nav ul li a:hover,
+            .main-header nav ul li button:hover {
+                background: #0b76a6;
+            }
+.main-header .user-name {
+    padding: 0 10px;
+    font-weight: 500;
+    color: #e0e0e0;
+}

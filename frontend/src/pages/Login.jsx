@@ -63,6 +63,7 @@ function Login() {
         const data = await response.json();
         localStorage.setItem('user', JSON.stringify(data));
         console.log('Respuesta del backend:', data);
+        window.dispatchEvent(new Event('localStorageUpdated'));
         navigate('/');
       } else {
         console.log('Error al iniciar sesion:', response.statusText);
