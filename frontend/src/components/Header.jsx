@@ -1,27 +1,90 @@
-import React from 'react';
+// ELMAY-APP/frontend/src/components/Header.jsx
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
 
 function Header() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    // Función para verificar si hay un usuario logeado
+    const checkUser = () => {
+      try {
+        const userData = localStorage.getItem('user');
+        // Si hay datos, los parseamos y actualizamos el estado
+        setUser(userData ? JSON.parse(userData) : null);
+      } catch (error) {
+        console.error('Error al leer datos de usuario del localStorage:', error);
+        setUser(null);
+      }
+    };
+
+    // Cerramos el dropdown si el usuario hace clic fuera de él
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setShowDropdown(false);
+        }
+    };
+
+    // Llamamos la función al montar el componente
+    checkUser();
+
+    // Añadimos un listener para el evento personalizado
+    // que se dispara desde el componente de Login
+    window.addEventListener('localStorageUpdated', checkUser);
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Limpiamos los listeners al desmontar el componente para evitar fugas de memoria
+    return () => {
+      window.removeEventListener('localStorageUpdated', checkUser);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []); // El array de dependencias vacío asegura que se ejecute solo una vez
+
+  const onLogout = () => {
+    localStorage.removeItem('user');
+    
+    // Disparamos el evento para que otros componentes sepan que el localStorage cambió
+    window.dispatchEvent(new Event('localStorageUpdated'));
+    
+    navigate('/');
+  };
+
+  const toggleDropdown = () => {
+      setShowDropdown(!showDropdown);
+  }
+
   return (
     <header className="main-header">
-		
-		<a className="logo-header" href="#">
-			<span className="site-name">FranciscoAMK</span>
-			<span className="site-desc">Diseño web / WordPress / Tutoriales</span>
-		</a> 
-
-		<nav>
-			<ul>
-				<li><a href="/">Inicio</a></li>
-				<li><a href="#">Acerca de</a></li>
-				<li><a href="#">Contacto</a></li>
-				<li><a href="/login">Sing In</a></li>
-				<li><a href="/login">Cesta</a></li>
-			</ul>
-		</nav>
-
-	</header>
-
+      <Link className="logo-header" to="/">
+        <span className="site-name">FranciscoAMK</span>
+        <span className="site-desc">Diseño web / WordPress / Tutoriales</span>
+      </Link>
+      <nav>
+        <ul>
+          <li><Link to="/">Inicio</Link></li>
+          {user ? (
+            <li className="user-dropdown" ref={dropdownRef}>
+              <span className="user-name" onClick={toggleDropdown}>Hola, {user.name}</span>
+              {showDropdown && (
+                <ul className="dropdown-menu">
+                  <li><Link to="/admin" onClick={toggleDropdown}>Panel de Admin</Link></li>
+                  <li><button onClick={() => { onLogout(); toggleDropdown(); }}>Cerrar Sesión</button></li>
+                </ul>
+              )}
+            </li>
+          ) : (
+            <>
+              <li><Link to="/login">Sign In</Link></li>
+            </>
+          )}
+		  <li><Link to="/cart">Cesta</Link></li>
+        </ul>
+      </nav>
+    </header>
   );
 }
 
