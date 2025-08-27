@@ -64,24 +64,36 @@ function Header() {
         <span className="site-desc">Diseño web / WordPress / Tutoriales</span>
       </Link>
       <nav>
-        <ul>
-          <li><Link to="/">Inicio</Link></li>
+        <ul className='ul-nav'>
+          <li><Link to="/" className='a-nav'>Inicio</Link></li>
           {user ? (
             <li className="user-dropdown" ref={dropdownRef}>
-              <span className="user-name" onClick={toggleDropdown}>Hola, {user.name}</span>
+              <span className="user-name" onClick={toggleDropdown}>Hola, {user.name} {user.role !== 'buyer' && (user.role)} </span>
               {showDropdown && (
                 <ul className="dropdown-menu">
-                  <li><Link to="/admin" onClick={toggleDropdown}>Panel de Admin</Link></li>
-                  <li><button onClick={() => { onLogout(); toggleDropdown(); }}>Cerrar Sesión</button></li>
+                  {/* Condicional anidada: muestra el enlace al panel de admin solo si el rol es 'admin' */}
+                  {user.role === 'admin' && (
+                    <>
+                      <li><Link to="/admin" className='a-nav' onClick={toggleDropdown}>Panel de Admin</Link></li>
+                      <li><Link to="/seller-panel" className='a-nav' onClick={toggleDropdown}>Panel de Vendedor</Link></li>
+                    </>
+                  )}
+                  {/* Condicional anidada: muestra el enlace al panel de vendedor solo si el rol es 'seller' */}
+                  {user.role === 'seller' && (
+                    <>
+                      <li><Link to="/seller" className='a-nav' onClick={toggleDropdown}>Panel de Vendedor</Link></li>
+                    </>
+                  )}
+                  <li><button onClick={() => { onLogout(); toggleDropdown(); }} className='button-nav'>Cerrar Sesión</button></li>
                 </ul>
               )}
             </li>
           ) : (
             <>
-              <li><Link to="/login">Sign In</Link></li>
+              <li><Link to="/login" className='a-nav'>Sign In</Link></li>
             </>
           )}
-		  <li><Link to="/cart">Cesta</Link></li>
+		      <li><Link to="/cart" className='a-nav'>Cesta</Link></li>
         </ul>
       </nav>
     </header>
