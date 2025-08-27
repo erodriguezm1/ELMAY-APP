@@ -29,17 +29,23 @@
         font-size: 0.8em;
         color: #999;
     }
-.main-header nav ul {
+/* Estilos para la barra de navegación principal */
+.main-header nav .ul-nav {
     margin: 0;
     padding: 0;
     list-style: none;
     display: flex;
 }
-    .main-header nav ul li {
-        line-height: 80px;
+    .main-header nav .ul-nav li .dropdown-menu li {
+        line-height: 39.2px; /* Se corrige para que coincida con la altura del header */
     }
-        .main-header nav ul li a,
-        .main-header nav ul li button {
+    .main-header nav .ul-nav li {
+        line-height: 80px; /* Se corrige para que coincida con la altura del header */
+    }
+        /* Estilos generales para todos los enlaces y botones dentro de la navegación */
+
+        .main-header nav .ul-nav li .a-nav,
+        .main-header nav .ul-nav li .user-name {
             display: block;
             padding: 0 10px;
             text-decoration: none;
@@ -49,12 +55,62 @@
             font-size: 1em;
             color: white;
         }
-            .main-header nav ul li a:hover,
-            .main-header nav ul li button:hover {
+            /* Estado hover para enlaces y botones */
+            .main-header nav .ul-nav li .a-nav:hover,
+            .main-header nav .ul-nav li .user-name:hover {
                 background: #0b76a6;
             }
+        .main-header nav .ul-nav li .user-name {
+            padding-top: 15px;
+        }
+/* Estilo para el nombre de usuario */
 .main-header .user-name {
     padding: 0 10px;
     font-weight: 500;
     color: #e0e0e0;
+    cursor: pointer;
 }
+
+/* --- ESTILOS PARA EL MENÚ DESPLEGABLE --- */
+.user-dropdown {
+    position: relative;
+    /* Evita que los elementos internos hereden el flex del padre */
+    display: block; 
+}
+.dropdown-menu {
+    position: absolute; 
+    top: 86%; 
+    right: 0;
+    background-color: #444; 
+    min-width: 160px;
+    z-index: 1000;
+    padding: 8px 0;
+    border-radius: 4px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    display: flex; 
+    flex-direction: column; 
+    list-style: none; 
+    line-height: normal; 
+}
+    .dropdown-menu li {
+        line-height: 1.2; 
+    }
+        /* Estilos para los enlaces y botones del dropdown */
+        .dropdown-menu li a,
+        .dropdown-menu li button {
+            margin:0px;
+            padding:0%;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            white-space: nowrap;
+            width: 100%;
+        }
+        .dropdown-menu li button {
+            border-radius: 0; /* Asegura un borde cuadrado para los botones */
+        }
+        .dropdown-menu li a:hover,
+        .dropdown-menu li button:hover {
+            background-color: #555; 
+        }

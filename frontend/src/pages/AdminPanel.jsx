@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
+import Header from '../components/Header';
 
 function AdminPanel() {
   const navigate = useNavigate();
