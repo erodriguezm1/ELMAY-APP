@@ -75,7 +75,7 @@ function Header() {
                   {user.role === 'admin' && (
                     <>
                       <li><Link to="/admin" className='a-nav' onClick={toggleDropdown}>Panel de Admin</Link></li>
-                      <li><Link to="/seller-panel" className='a-nav' onClick={toggleDropdown}>Panel de Vendedor</Link></li>
+                      <li><Link to="/seller" className='a-nav' onClick={toggleDropdown}>Panel de Vendedor</Link></li>
                     </>
                   )}
                   {/* Condicional anidada: muestra el enlace al panel de vendedor solo si el rol es 'seller' */}

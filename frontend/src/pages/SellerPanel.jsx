@@ -1,25 +1,30 @@
 // ELMAY-APP/frontend/src/pages/SellerPanel.jsx
+
+// ELMAY-APP/frontend/src/pages/SellerPanel.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header.jsx';
-import './SellerPanel.css'; // Crearás este archivo CSS a continuación
+import ProductList from '../components/ProductList.jsx';
+import AddProductForm from '../components/AddProductForm.jsx';
+import './SellerPanel.css';
 
 function SellerPanel() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshList, setRefreshList] = useState(false); // Estado para forzar la recarga
 
   useEffect(() => {
     try {
       const userData = localStorage.getItem('user');
       if (userData) {
         const parsedUser = JSON.parse(userData);
-        // Opcional: Redirige si el usuario no tiene el rol de vendedor
         if (parsedUser.role !== 'seller' && parsedUser.role !== 'admin') {
           navigate('/');
         }
         setUser(parsedUser);
       } else {
-        // Redirige al login si no hay datos de usuario
         navigate('/login');
       }
     } catch (error) {
@@ -27,6 +32,12 @@ function SellerPanel() {
       navigate('/login');
     }
   }, [navigate]);
+
+  // Esta función se llama desde el modal cuando un producto se crea con éxito
+  const handleProductCreated = () => {
+    setIsModalOpen(false); // Cierra el modal
+    setRefreshList(prev => !prev); // Alterna el estado para forzar la recarga de ProductList
+  };
 
   if (!user) {
     return <div>Cargando...</div>;
@@ -38,10 +49,29 @@ function SellerPanel() {
         <h1>Panel de Vendedor</h1>
         <p>Bienvenido, {user.name}!</p>
         <p>Aquí podrás gestionar tus productos y ventas.</p>
-        {/* Aquí puedes agregar la lógica para mostrar los productos del vendedor */}
+
+        {/* Botón para abrir el modal */}
+        <button className="add-product-button" onClick={() => setIsModalOpen(true)}>
+          Añadir Producto
+        </button>
+
+        {/* Usa tu componente AddProductForm como un modal */}
+        <AddProductForm
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onProductCreated={handleProductCreated}
+        />
+
+        {/*
+          ProductList se recarga cuando refreshList cambia.
+          El cambio de `key` fuerza a React a "re-montar" el componente,
+          ejecutando de nuevo su `useEffect` para obtener los datos más recientes.
+        */}
+        <ProductList key={refreshList} />
       </div>
     </div>
   );
+  
 }
 
 export default SellerPanel;

@@ -47,7 +47,7 @@ function App() {
           } 
         />
         <Route 
-          path="/seller-panel" 
+          path="/seller" 
           element={
             <PrivateRoute allowedRoles={['seller', 'admin']}>
               <SellerPanel user={user} />
