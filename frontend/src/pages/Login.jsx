@@ -62,7 +62,10 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('user', JSON.stringify(data));
-        console.log('Respuesta del backend:', data);
+        // Guarda el token en una clave separada para fácil acceso
+        // Este es el ajuste clave 🔑
+        localStorage.setItem('authToken', data.token);
+        console.log('Usuario logueado con éxito:', data.name);
         window.dispatchEvent(new Event('localStorageUpdated'));
         navigate('/');
       } else {

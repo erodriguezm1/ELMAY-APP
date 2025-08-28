@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db'); // Importa la función de conexión
 const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes');
 const cors = require('cors');
 
 // Cargar variables de entorno
@@ -24,6 +25,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
 
 // Iniciar el servidor
 app.listen(PORT, () => {

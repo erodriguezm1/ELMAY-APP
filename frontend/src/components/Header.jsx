@@ -60,8 +60,8 @@ function Header() {
   return (
     <header className="main-header">
       <Link className="logo-header" to="/">
-        <span className="site-name">FranciscoAMK</span>
-        <span className="site-desc">Diseño web / WordPress / Tutoriales</span>
+        <span className="site-name">ELMAY</span>
+        <span className="site-desc">Venta de productos y servicios</span>
       </Link>
       <nav>
         <ul className='ul-nav'>
@@ -75,7 +75,7 @@ function Header() {
                   {user.role === 'admin' && (
                     <>
                       <li><Link to="/admin" className='a-nav' onClick={toggleDropdown}>Panel de Admin</Link></li>
-                      <li><Link to="/seller-panel" className='a-nav' onClick={toggleDropdown}>Panel de Vendedor</Link></li>
+                      <li><Link to="/seller" className='a-nav' onClick={toggleDropdown}>Panel de Vendedor</Link></li>
                     </>
                   )}
                   {/* Condicional anidada: muestra el enlace al panel de vendedor solo si el rol es 'seller' */}

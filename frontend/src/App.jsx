@@ -12,6 +12,7 @@ import Footer from './components/Footer.jsx';
 import AdminPanel from './pages/AdminPanel.jsx';
 import SellerPanel from './pages/SellerPanel.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
+import SessionTimeout from './components/SessionTimeout';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -34,27 +35,30 @@ function App() {
   };
   return (
     <Router>
+      <SessionTimeout />
       <Header user={user} onLogout={onLogout} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route 
-          path="/admin" 
-          element={
-            <PrivateRoute allowedRoles={['admin']}>
-              <AdminPanel user={user} />
-            </PrivateRoute>
-          } 
-        />
-        <Route 
-          path="/seller-panel" 
-          element={
-            <PrivateRoute allowedRoles={['seller', 'admin']}>
-              <SellerPanel user={user} />
-            </PrivateRoute>
-          } 
-        />
-      </Routes>
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route 
+            path="/admin" 
+            element={
+              <PrivateRoute allowedRoles={['admin']}>
+                <AdminPanel user={user} />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/seller" 
+            element={
+              <PrivateRoute allowedRoles={['seller', 'admin']}>
+                <SellerPanel user={user} />
+              </PrivateRoute>
+            } 
+          />
+        </Routes>
+      </main>
       <Footer />
     </Router>
   );
