@@ -14,7 +14,7 @@ const ProductList = forwardRef((props, ref) => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       
       if (!token) {
         setError('No autorizado, por favor inicia sesión.');

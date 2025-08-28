@@ -60,8 +60,8 @@ function Header() {
   return (
     <header className="main-header">
       <Link className="logo-header" to="/">
-        <span className="site-name">FranciscoAMK</span>
-        <span className="site-desc">Diseño web / WordPress / Tutoriales</span>
+        <span className="site-name">ELMAY</span>
+        <span className="site-desc">Venta de productos y servicios</span>
       </Link>
       <nav>
         <ul className='ul-nav'>
