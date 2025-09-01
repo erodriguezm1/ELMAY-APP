@@ -31,6 +31,11 @@ const productSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  status: {
+        type: String,
+        enum: ['pending', 'active', 'suspended', 'deleted'],
+        default: 'pending'
+    },
 }, {
   timestamps: true, // Agrega campos createdAt y updatedAt automáticamente
 });
