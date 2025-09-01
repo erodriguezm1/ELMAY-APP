@@ -12,8 +12,11 @@
         color: white;
     }
 .main-header .logo-header {
+    display: flex;
     text-decoration: none;
     padding: 0;
+    align-items: center;
+    gap: 10px;
 }
     .main-header .logo-header:hover {
         color: #0b76a6;
@@ -28,6 +31,11 @@
         font-weight: 300;
         font-size: 0.8em;
         color: #999;
+    }
+    .main-header .logo-header .logo {
+        display: block;
+        height: 40px;
+        width: auto;
     }
 /* Estilos para la barra de navegación principal */
 .main-header nav .ul-nav {

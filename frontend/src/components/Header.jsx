@@ -60,6 +60,7 @@ function Header() {
   return (
     <header className="main-header">
       <Link className="logo-header" to="/">
+         <img src="../../static/index/image/elmay-logo.webp" alt="Logo de ELMAY" className="logo" />
         <span className="site-name">ELMAY</span>
         <span className="site-desc">Venta de productos y servicios</span>
       </Link>
