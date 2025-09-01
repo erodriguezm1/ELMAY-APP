@@ -17,11 +17,20 @@ import SessionTimeout from './components/SessionTimeout';
 function App() {
   const [user, setUser] = useState(null);
 
+  const isTokenValid = (token) => {
+    return !!token;
+  };
+
+
   useEffect(() => {
     try {
       const userData = localStorage.getItem('user');
-      if (userData) {
+      const authToken = localStorage.getItem('authToken');
+      if (userData && isTokenValid(authToken)) {
         setUser(JSON.parse(userData));
+      } else {
+        // Si el token es inválido o no existe, cierra la sesión.
+        onLogout();
       }
     } catch (error) {
       console.error("Error al parsear los datos del usuario en App.jsx:", error);
@@ -31,6 +40,7 @@ function App() {
 
   const onLogout = () => {
     localStorage.removeItem('user');
+    localStorage.removeIten('token');
     setUser(null);
   };
   return (
@@ -58,6 +68,7 @@ function App() {
             } 
           />
         </Routes>
+        <script src="//code.tidio.co/cnpkfi4vnh0h2cauzgtxggyvrucrbi0z.js" async></script>
       </main>
       <Footer />
     </Router>

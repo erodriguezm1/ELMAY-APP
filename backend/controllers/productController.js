@@ -47,13 +47,22 @@ const getProducts = async (req, res) => {
   }
 };
 
+const getProductsAll = async (req, res) => {
+  try {
+    const products = await Product.find({}).populate('seller', 'name'); // Encuentra todos los productos sin filtros
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener los productos', error: error.message });
+  }
+};
+
 // @desc    Obtener los productos del vendedor logueado (ruta privada)
 // @route   GET /api/products/seller
 // @access  Private
 const getSellerProducts = async (req, res) => {
   try {
     const sellerId = req.user._id;
-    const products = await Product.find({ seller: sellerId }); // Filtra por el ID del vendedor
+    const products = await Product.find({ seller: sellerId }).populate('seller', 'name'); // Filtra por el ID del vendedor
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener los productos del vendedor', error: error.message });
@@ -63,5 +72,6 @@ const getSellerProducts = async (req, res) => {
 module.exports = {
   createProduct,
   getProducts,
+  getProductsAll,
   getSellerProducts,
 };
