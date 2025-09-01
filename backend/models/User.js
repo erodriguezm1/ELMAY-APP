@@ -29,6 +29,11 @@ const userSchema = mongoose.Schema(
       default: 'buyer', 
       enum: ['buyer', 'seller', 'admin'],
     },
+    status: {
+        type: String,
+        enum: ['pending', 'active', 'suspended', 'deleted'],
+        default: 'pending'
+    },
   },
   {
     timestamps: true,

@@ -1,8 +1,9 @@
 // ELMAY-APP/backend/routes/userRoutes.js
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUser } = require('../controllers/userController');
+const { registerUser, loginUser, getUsers, getUserById, updateUser, deleteUser } = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+const { admin } = require('../middleware/adminMiddleware');
 
 // La ruta POST /api/users ejecutará la función registerUser
 router.post('/register', registerUser);
@@ -29,5 +30,17 @@ router.get('/index', protect, authorize('buyer', 'seller', 'admin'), (req, res) 
 router.get('/admin', protect, authorize('admin'), (req, res) => {
   res.json({ message: `Welcome to the admin dashboard, ${req.user.username}!` });
 });
+
+
+// *************** RUTAS PARA EL PANEL DE ADMINISTRACIÓN ***************
+
+// Rutas para obtener todos los usuarios y para gestionar un usuario específico
+router.route('/')
+    .get(protect, admin, getUsers);
+
+router.route('/:id')
+    .get(protect, admin, getUserById)
+    .put(protect, admin, updateUser)
+    .delete(protect, admin, deleteUser);
 
 module.exports = router;

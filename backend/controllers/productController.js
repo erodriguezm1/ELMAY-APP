@@ -23,6 +23,7 @@ const createProduct = async (req, res) => {
       imageUrl,
       stock,
       seller: sellerId,
+      status: true,
     });
 
     await newProduct.save();
