@@ -1,7 +1,17 @@
 // ELMAY-APP/backend/routes/userRoutes.js
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUser, getUsers, getUserById, updateUser, deleteUser } = require('../controllers/userController');
+const { 
+  registerUser, 
+  loginUser, 
+  getUsers, 
+  getUserById, 
+  updateUser, 
+  deleteUser, 
+  getUserProfile, 
+  updateUserProfile,
+  getPublicUsers 
+} = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
 
