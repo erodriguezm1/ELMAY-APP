@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
+import AdminUserPanel from '../components/AdminUserPanel';
 import Header from '../components/Header';
 
 function AdminPanel() {
@@ -35,10 +36,7 @@ function AdminPanel() {
   return (
     <div className="admin-panel-container">
       <div className="admin-panel-card">
-        <h1>Panel de Administración</h1>
-        <p>Bienvenido, {user.name}!</p>
-        <p>Aquí podrás gestionar los productos de la tienda.</p>
-        <button onClick={onLogout}>Cerrar Sesión</button>
+        <AdminUserPanel/>
       </div>
     </div>
   );

@@ -2,7 +2,9 @@
   display: flex;
   justify-content: center; /* Centra horizontalmente */
   align-items: center;     /* Centra verticalmente */
-  width: 100%;             /* Ocupa el 100% del ancho */
+  width: 80%;             /* Ocupa el 100% del ancho */
+  height: 100%;
+  margin-top: 30px;
 }
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
 
@@ -17,7 +19,6 @@ body {
 	align-items: center;
 	flex-direction: column;
 	font-family: 'Montserrat', sans-serif;
-	height: 100vh;
 	margin: -20px 0 50px;
 }
 

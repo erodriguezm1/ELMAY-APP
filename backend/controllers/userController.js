@@ -28,7 +28,7 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
         password,
         role: role || 'buyer', // Asigna el rol si se envía, de lo contrario, por defecto es 'buyer'
-        status: true, // Nuevo atributo: siempre true al registrar
+        status: "pending", // Nuevo atributo: siempre true al registrar
     });
 
     // 4. Enviar una respuesta con el token JWT
@@ -140,7 +140,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (user) {
-            user.status = false; // Soft delete: cambia el estado en lugar de eliminar
+            user.status = "deleted"; // Soft delete: cambia el estado en lugar de eliminar
             await user.save();
             res.status(200).json({ message: 'Usuario desactivado con éxito' });
         } else {
