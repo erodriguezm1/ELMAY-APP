@@ -28,7 +28,7 @@ const registerUser = asyncHandler(async (req, res) => {
         email,
         password,
         role: role || 'buyer', // Asigna el rol si se envía, de lo contrario, por defecto es 'buyer'
-        status: true, // Nuevo atributo: siempre true al registrar
+        status: "pending", // Nuevo atributo: siempre true al registrar
     });
 
     // 4. Enviar una respuesta con el token JWT
@@ -54,7 +54,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
 
-    // 1. Verificar si el usuario existe por su email
+    // 1. Verificar si el usuario existe por su username
     const user = await User.findOne({ username });
 
     // 2. Si el usuario existe, la contraseña es correcta Y el status es 'true', devolver el token
@@ -140,7 +140,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (user) {
-            user.status = false; // Soft delete: cambia el estado en lugar de eliminar
+            user.status = "deleted"; // Soft delete: cambia el estado en lugar de eliminar
             await user.save();
             res.status(200).json({ message: 'Usuario desactivado con éxito' });
         } else {
@@ -151,6 +151,66 @@ const deleteUser = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Get user profile
+// @route   GET /api/users/profile
+// @access  Private
+const getUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id).select('-password');
+
+    if (user) {
+        res.json({
+            _id: user._id,
+            username: user.username,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            status: user.status,
+        });
+    } else {
+        res.status(404);
+        throw new Error('Usuario no encontrado');
+    }
+});
+
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        user.name = req.body.name || user.name;
+        user.email = req.body.email || user.email;
+        user.username = req.body.username || user.username;
+        if (req.body.password) {
+            user.password = req.body.password;
+        }
+
+        const updatedUser = await user.save();
+
+        res.json({
+            _id: updatedUser._id,
+            username: updatedUser.username,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            status: updatedUser.status,
+            token: updatedUser.generateAuthToken(),
+        });
+    } else {
+        res.status(404);
+        throw new Error('Usuario no encontrado');
+    }
+});
+
+// @desc    Get public users (with restricted fields)
+// @route   GET /api/users/public
+// @access  Public
+const getPublicUsers = asyncHandler(async (req, res) => {
+    const users = await User.find({ status: true }).select('username name role');
+    res.json(users);
+});
+
 module.exports = {
     registerUser,
     loginUser,
@@ -158,4 +218,7 @@ module.exports = {
     getUserById,
     updateUser,
     deleteUser,
+    getUserProfile,
+    updateUserProfile,
+    getPublicUsers
 };
