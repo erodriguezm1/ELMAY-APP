@@ -1,6 +1,3 @@
-# ELMAY/docker-compose.yml
-version: '3.8'
-
 services:
   backend:
     build: ./backend
@@ -31,18 +28,24 @@ services:
       - ./frontend:/app
       - /app/node_modules
       
-  # --- Servicio de la Base de Datos ---
+ # --- Servicio de la Base de Datos (con persistencia física) ---
   mongo:
-    image: mongo:latest # Usaremos la última versión oficial de MongoDB
-    container_name: elmay-mongodb # Un nombre descriptivo para el contenedor
-    ports:
-      - "27017:27017" # Mapea el puerto de MongoDB a tu máquina local (opcional para acceso directo)
+    image: mongo:latest
+    container_name: elmay-mongodb
+    # 🌟 CAMBIO CLAVE: Usamos Bind Mount para persistencia física
     volumes:
-      - mongo-data:/data/db # **CRUCIAL:** Persistencia de datos para MongoDB
+      # Mapea la carpeta local './data/mongo' (que debes crear)
+      # a la carpeta interna de datos de MongoDB /data/db
+      - ./data/mongo:/data/db 
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin # Usuario raíz inicial
-      MONGO_INITDB_ROOT_PASSWORD: password # Contraseña raíz inicial (¡Cámbiala en producción!)
-
-# Volúmenes para persistencia de datos
-volumes:
-  mongo-data: # Define el volumen nombrado para MongoDB
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s

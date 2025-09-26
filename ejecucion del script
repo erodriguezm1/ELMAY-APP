@@ -1,0 +1,11 @@
+chmod +x backup.sh
+3.  Asegúrate de que tus contenedores Docker estén corriendo:
+```bash
+docker-compose up -d
+4.  Ejecuta el respaldo:
+```bash
+./backup.sh
+
+# Ejemplo de restauración:
+docker exec -i elmay-mongodb bash -c 'tar -xzf - -C /tmp && mongorestore --db=ecommerce --username=admin --password=password --authenticationDatabase=admin /tmp/ecommerce' < backups/mongo_backup_NOMBRE.tar.gz
+

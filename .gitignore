@@ -1,0 +1,30 @@
+----------------------------------------------------------------
+Configuración específica para el proyecto ELMAY con Docker/Node
+----------------------------------------------------------------
+1. Dependencias de Node.js (Frontend y Backend)
+Esto es crucial, ya que los módulos se instalan dentro del contenedor.
+Nunca se deben subir a Git.
+**/node_modules
+.DS_Store
+
+2. Archivos de Entorno
+Contienen credenciales o rutas específicas de la máquina (¡nunca en Git!)
+.env
+.env.local
+
+3. Persistencia de la Base de Datos
+IGNORAR la carpeta binaria de MongoDB (Bind Mount) para mantener Git ligero.
+Esta carpeta crece rápidamente y contiene archivos binarios.
+data/mongo/
+
+4. Respaldo de Datos (Backups)
+Aunque los dumps son pequeños, ignoramos la carpeta completa para no subir
+los respaldos automáticos que se generen localmente.
+backups/
+
+5. Archivos de Registro y Logs de la aplicación (si existen)
+*.log
+
+6. Caché de Docker/Build
+Ignorar las carpetas de cacheo temporal de los builders de Docker
+.docker_cache/
