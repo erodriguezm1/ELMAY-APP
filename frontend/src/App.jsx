@@ -40,7 +40,7 @@ function App() {
 
   const onLogout = () => {
     localStorage.removeItem('user');
-    localStorage.removeIten('token');
+    localStorage.removeItem('token');
     setUser(null);
   };
   return (
