@@ -39,27 +39,7 @@ services:
       - VITE_APP_API_URL=/api
     depends_on:
       - backend
-<<<<<<< HEAD
 
-  mongo:
-    image: mongo:4.4
-    container_name: elmay-mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.runCommand({ping: 1})", "--quiet"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-
-volumes:
-  mongo-data:
-=======
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -85,4 +65,4 @@ volumes:
       timeout: 5s
       retries: 5
       start_period: 20s
->>>>>>> desarrollocrear
+
