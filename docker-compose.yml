@@ -40,7 +40,7 @@ services:
       
  # --- Servicio de la Base de Datos (con persistencia física) ---
   mongo:
-    image: mongo:latest
+    image: mongo:4.4
     container_name: elmay-mongodb
     # 🌟 CAMBIO CLAVE: Usamos Bind Mount para persistencia física
     volumes:
