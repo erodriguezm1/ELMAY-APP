@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-# ELMAY-APP/docker-compose.yml
-version: '3.8'
-
-=======
->>>>>>> desarrollocrear
 services:
   nginx:
     image: nginx:latest
