@@ -1,109 +1,481 @@
-/* ELMAY-APP/frontend/src/pages/Home.css */
-
 /* Contenedor principal para la página */
 .home-container {
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
     color: #333;
-    background-color: #f4f4f4;
+    background-color: #f8f8f8; /* Fondo más claro */
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Encabezado */
-.home-header {
-    background-color: #fff;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.home-header h1 {
-    margin: 0;
-    font-size: 2.5em;
-    color: #34495e;
-}
-
-.home-header p {
-    color: #7f8c8d;
-    font-size: 1.2em;
-}
-
-.nav-links {
-    list-style: none;
-    padding: 0;
-    margin: 10px 0 0;
-}
-
-.nav-links li {
-    display: inline;
-    margin: 0 15px;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: #2c3e50;
-    font-weight: bold;
-    transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-    color: #e74c3c;
-}
-
-/* Contenido principal */
-.home-content {
-    flex: 1;
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
-    width: 100%;
 }
 
-.product-list {
+.main-title {
+    text-align: center;
+    font-size: 2.8em;
+    color: #007bff; /* Azul primario */
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #007bff;
+}
+
+/* --- SECCIÓN DE CATEGORÍAS --- */
+
+.categories-menu-container {
     background-color: #fff;
-    padding: 30px;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+.category-buttons-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* ESTILOS PARA EL DROPDOWN DE SUBCATEGORÍAS */
+
+.category-dropdown-wrapper {
+    position: relative; /* Contenedor para posicionar el dropdown */
+    /* El wrapper debe ser inline-block para no ocupar todo el ancho si estamos en flex */
+    display: inline-block; 
+}
+
+/* Estilo para el botón principal de categoría */
+.category-button {
+    background-color: #f0f0f0;
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    white-space: nowrap; /* Evitar que el texto del botón se rompa */
+}
+
+.category-button:hover,
+.category-dropdown-wrapper:hover .category-button { /* Mantiene el estilo hover en el botón padre */
+    background-color: #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.category-button.active {
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Estilo para la categoría padre que tiene una subcategoría activa */
+.category-button.active-parent {
+    background-color: #0099ff; /* Un azul ligeramente diferente para indicar que es el padre de una selección */
+    color: white;
+}
+
+
+.subcategory-dropdown {
+    display: none; /* Inicialmente oculto */
+    position: absolute;
+    top: 100%; /* Posicionamiento debajo del botón principal */
+    left: 50%;
+    transform: translateX(-50%); /* Centrar el dropdown */
+    z-index: 50; /* Sobreponerse a otros elementos */
+    background-color: #fff;
+    border: 1px solid #ccc;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 10px;
+    min-width: 180px;
+    /* FIX: Se eliminó margin-top: 5px; para evitar la "zona muerta" que hacía desaparecer el menú al mover el mouse. */
+    text-align: left;
+    white-space: nowrap;
 }
 
-.product-list h2 {
+/* Mostrar el dropdown cuando el usuario pasa el mouse sobre el wrapper */
+.category-dropdown-wrapper:hover .subcategory-dropdown {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.subcategory-button {
+    background-color: transparent;
+    border: none;
+    padding: 8px 10px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #555;
+    border-radius: 5px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.subcategory-button:hover {
+    background-color: #f0f0f0;
+    color: #007bff;
+}
+
+.subcategory-button.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+
+/* --- NUEVA SECCIÓN: BARRA DE FILTROS (Búsqueda y Precio) --- */
+.filter-bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 20px;
+    margin-bottom: 40px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* 1. ESTILOS DEL BUSCADOR */
+.search-filter-wrapper {
+    flex-grow: 1; /* Ocupa el espacio disponible */
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    font-size: 1em;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+/* 2. ESTILOS DEL FILTRO DE PRECIOS */
+.price-range-filter {
+    width: 100%; /* Ocupa todo el ancho en el layout de columna */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 10px;
+}
+
+.price-label {
+    font-weight: 600;
+    font-size: 1.1em;
     color: #34495e;
-    text-align: center;
-    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.product-placeholder {
-    background-color: #ecf0f1;
-    border: 1px solid #bdc3c7;
-    border-radius: 6px;
-    padding: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-    color: #7f8c8d;
-    font-style: italic;
+.current-price-display {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 700;
 }
 
-/* Pie de página */
-.home-footer {
-    background-color: #2c3e50;
-    color: #fff;
-    text-align: center;
-    padding: 20px;
+.range-slider {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 100%; 
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: opacity .2s;
 }
 
-.home-footer p {
-    margin: 0;
+.range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; 
+    background: #007bff;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    transition: background 0.3s;
+}
+
+.range-slider::-webkit-slider-thumb:hover {
+    background: #0056b3;
+}
+
+.price-labels {
+    display: flex;
+    justify-content: space-between;
     font-size: 0.9em;
+    color: #666;
+    margin-top: -5px; /* Ajuste visual */
+}
+/* FIN NUEVA SECCIÓN DE FILTROS */
+
+
+/* --- SECCIÓN DE OFERTAS DESTACADAS --- */
+
+.featured-offers-section {
+    margin-bottom: 40px;
+    padding: 20px;
+    border: 2px solid #ff4500; /* Naranja rojizo */
+    background-color: #fffaf0; /* Fondo muy claro para destacar */
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
 }
 
-/* Media queries para diseño responsivo */
+.section-title-offer {
+    text-align: center;
+    font-size: 2.2em;
+    color: #ff4500;
+    margin-bottom: 25px;
+    font-weight: 800;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.offer-card {
+    position: relative;
+    border: 3px solid #ff4500;
+    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    animation: pulse-border 1.5s infinite alternate; /* Animación para llamar la atención */
+}
+
+@keyframes pulse-border {
+    from { box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3); }
+    to { box-shadow: 0 5px 25px rgba(255, 69, 0, 0.6); }
+}
+
+.offer-badge {
+    position: absolute;
+    top: 15px;
+    right: -20px;
+    background-color: #ffc107; /* Amarillo */
+    color: #333;
+    padding: 5px 25px;
+    font-weight: bold;
+    transform: rotate(45deg);
+    font-size: 0.9em;
+    z-index: 10;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9em;
+    margin-right: 10px;
+}
+
+.offer-price {
+    color: #ff4500;
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.view-details-button {
+    display: block;
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.view-details-button:hover {
+    background-color: #0056b3;
+}
+
+/* --- SECCIÓN DE PRODUCTOS GENERALES Y GRID --- */
+
+.section-title {
+    font-size: 1.8em;
+    color: #34495e;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.general-products-section {
+    margin-top: 30px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.product-card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+}
+
+.product-info {
+    padding: 15px;
+}
+
+.product-info h3 {
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: #34495e;
+    font-weight: 700;
+}
+
+.product-category-tag { /* Nuevo estilo para la etiqueta de categoría/subcategoría */
+    font-size: 0.85em;
+    color: #555;
+    display: block;
+    margin-bottom: 8px;
+    background-color: #f0f0f0;
+    padding: 3px 6px;
+    border-radius: 5px;
+    width: fit-content;
+}
+
+.product-description {
+    color: #7f8c8d;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    max-height: 40px;
+    overflow: hidden;
+}
+
+.product-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.product-price {
+    font-size: 1.5em;
+    color: #27ae60; /* Verde para precios */
+    font-weight: bold;
+}
+
+.product-stock {
+    font-size: 0.9em;
+    color: #999;
+    padding: 5px 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.no-products-message {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.1em;
+    color: #e74c3c;
+    background-color: #fff0f0;
+    border: 1px dashed #e74c3c;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+/* ESTILOS DE ESTADO (Carga y Error) */
+.loading, .error {
+    text-align: center;
+    padding: 50px;
+    font-size: 1.2em;
+    margin: 50px auto;
+    border-radius: 8px;
+    max-width: 600px;
+}
+
+.loading {
+    color: #007bff;
+    background-color: #e0f7ff;
+    border: 1px solid #007bff;
+}
+
+.error {
+    color: #e74c3c;
+    background-color: #fdd;
+    border: 1px solid #e74c3c;
+}
+
+
+/* RESPONSIVE */
+@media (min-width: 769px) {
+    /* En escritorio, que la barra de filtros sea horizontal */
+    .filter-bar-container {
+        flex-direction: row;
+        align-items: center;
+    }
+    .price-range-filter {
+        max-width: 300px; /* Limitar el ancho del slider */
+    }
+}
+
+
 @media (max-width: 768px) {
-    .home-header h1 {
-        font-size: 2em;
+    .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .main-title {
+        font-size: 2.2em;
+    }
+    .category-buttons-list {
+        /* Permitimos que se envuelvan, pero quitamos el gap de 10px y centramos */
+        justify-content: center;
+        gap: 8px;
+    }
+    .categories-menu-container {
+        padding: 15px;
+    }
+    .category-button {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+    .section-title-offer {
+        font-size: 1.8em;
+    }
+    
+    /* En móvil, los dropdowns se desactivan por hover y se ocultan */
+    .category-dropdown-wrapper {
+        /* Para que el wrapper ocupe solo el espacio necesario en el flexbox horizontal */
+        display: inline-block; 
     }
 
-    .home-header p {
-        font-size: 1em;
+    .subcategory-dropdown {
+        /* Ocultar en móvil, ya que el hover no funciona bien en pantallas táctiles */
+        display: none !important; 
+    }
+}
+
+@media (max-width: 500px) {
+    .product-grid {
+        grid-template-columns: 1fr;
     }
 }
