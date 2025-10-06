@@ -8,6 +8,14 @@ const productSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  category: {
+    type: String,
+    required: true,
+  },
+  subcategory: {
+    type: String,
+    required: true,
+  },
   description: {
     type: String,
     required: true,
@@ -33,9 +41,20 @@ const productSchema = new mongoose.Schema({
   },
   status: {
         type: String,
-        enum: ['pending', 'active', 'suspended', 'deleted'],
-        default: 'pending'
+        enum: ['active', 'suspended', 'deleted'],
+        default: 'active'
     },
+  isOffer: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  isMegaOffer: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+
 }, {
   timestamps: true, // Agrega campos createdAt y updatedAt automáticamente
 });
