@@ -6,79 +6,78 @@ import AddProductForm from '../components/AddProductForm.jsx';
 import './SellerPanel.css';
 
 function SellerPanel() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [refreshList, setRefreshList] = useState(false); // Estado para forzar la recarga
+    const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [refreshList, setRefreshList] = useState(false); // Estado para forzar la recarga
 
-  useEffect(() => {
-    try {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        const parsedUser = JSON.parse(userData);
-        if (parsedUser.role !== 'seller' && parsedUser.role !== 'admin') {
-          navigate('/');
-        }
-        setUser(parsedUser);
-      } else {
-        navigate('/login');
-      }
-    } catch (error) {
-      console.error('Error al parsear los datos del usuario:', error);
-      navigate('/login');
-    }
-  }, [navigate]);
+    useEffect(() => {
+        try {
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                const parsedUser = JSON.parse(userData);
+                if (parsedUser.role !== 'seller' && parsedUser.role !== 'admin') {
+                    navigate('/');
+                }
+                setUser(parsedUser);
+            } else {
+                navigate('/login');
+            }
+        } catch (error) {
+            console.error('Error al parsear los datos del usuario:', error);
+            navigate('/login');
+        }
+    }, [navigate]);
 
-  // Esta función se llama desde el modal cuando un producto se crea con éxito
-  const handleProductCreated = () => {
-    setIsModalOpen(false); // Cierra el modal
-    setRefreshList(prev => !prev); // Alterna el estado para forzar la recarga de ProductList
-  };
+    // Esta función se llama desde el modal cuando un producto se crea con éxito
+    const handleProductCreated = () => {
+        setIsModalOpen(false); // Cierra el modal
+        setRefreshList(prev => !prev); // Alterna el estado para forzar la recarga de ProductList
+    };
   
-  // Función para forzar la recarga de la lista después de una actualización de status/oferta
-  const handleProductUpdated = () => {
-    setRefreshList(prev => !prev);
-  };
+    // Función para forzar la recarga de la lista después de una actualización de status/oferta
+    const handleProductUpdated = () => {
+        setRefreshList(prev => !prev);
+    };
 
-  if (!user) {
-    return <div>Cargando...</div>;
-  }
+    if (!user) {
+        return <div>Cargando...</div>;
+      }
   
-  const isAdmin = user.role === 'admin';
+    const isAdmin = user.role === 'admin';
 
-  return (
-    <div className="seller-panel-container">
-      <div className="seller-panel-card">
-        <h1>Panel de Vendedor</h1>
-        <p>Bienvenido, {user.name}!</p>
-        <p>Aquí podrás gestionar tus productos y ventas.</p>
+    return (
+        <div className="seller-panel-container">
+            <div className="seller-panel-card">
+                <h1>Panel de Vendedor</h1>
+                <p>Bienvenido, {user.name}!</p>
+                <p>Aquí podrás gestionar tus productos y ventas.</p>
 
-        {/* Botón para abrir el modal */}
-        <button className="add-product-button" onClick={() => setIsModalOpen(true)}>
-          Añadir Producto
-        </button>
+                {/* Botón para abrir el modal */}
+                <button className="add-product-button" onClick={() => setIsModalOpen(true)}>
+                    Añadir Producto
+                </button>
 
-        {/* Usa tu componente AddProductForm como un modal */}
-        <AddProductForm
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onProductCreated={handleProductCreated}
-        />
+                {/* Usa tu componente AddProductForm como un modal */}
+                <AddProductForm
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onProductCreated={handleProductCreated}
+                />
 
-        {/*
-          Se añade `isAdmin` y `onProductUpdated` para que ProductList pueda:
-          1. Mostrar las herramientas de administración condicionalmente.
-          2. Recargar la lista tras una actualización de estado (status/oferta).
-        */}
-        <ProductList 
-          key={refreshList} 
-          isAdmin={isAdmin} 
-          onProductUpdated={handleProductUpdated}
-        />
-      </div>
-    </div>
-  );
-  
+                {/*
+                  Se añade `isAdmin` y `onProductUpdated` para que ProductList pueda:
+                  1. Mostrar las herramientas de administración condicionalmente.
+                  2. Recargar la lista tras una actualización de estado (status/oferta).
+                */}
+                <ProductList 
+                    key={refreshList} 
+                    isAdmin={isAdmin} 
+                    onProductUpdated={handleProductUpdated}
+                />
+            </div>
+        </div>
+    );
 }
 
 export default SellerPanel;
