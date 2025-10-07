@@ -11,8 +11,11 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+    # --- BLOQUE CORREGIDO ---
     depends_on:
-      - mongo
+      # Ahora es un mapa clave-valor, no un elemento de lista.
+      mongo:
+        condition: service_healthy
 
   frontend:
     build: ./frontend
@@ -28,14 +31,11 @@ services:
       - ./frontend:/app
       - /app/node_modules
       
- # --- Servicio de la Base de Datos (con persistencia física) ---
+  # --- Servicio de la Base de Datos (con persistencia física) ---
   mongo:
     image: mongo:4.4
     container_name: elmay-mongodb
-    # 🌟 CAMBIO CLAVE: Usamos Bind Mount para persistencia física
     volumes:
-      # Mapea la carpeta local './data/mongo' (que debes crear)
-      # a la carpeta interna de datos de MongoDB /data/db
       - ./data/mongo:/data/db 
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
