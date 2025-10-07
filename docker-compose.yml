@@ -1,31 +1,38 @@
 services:
+  # --------------------
+  # 1. NGINX Reverse Proxy
+  # --------------------
   nginx:
     image: nginx:latest
     container_name: elmay-nginx
+    # Expone solo los puertos 80 (HTTP) y 443 (HTTPS) del Droplet
     ports:
       - "80:80"
       - "443:443"
     volumes:
-
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./certs:/etc/nginx/certs
+     - ./nginx.conf:/etc/nginx/nginx.conf
+      # (Dejar deshabilitado por ahora) - ./certs:/etc/nginx/certs 
     depends_on:
       - frontend
       - backend
 
+  # --------------------
+  # 2. Backend Service (Node/Express)
+  # --------------------
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: elmay-backend
-    env_file:
-      - ./backend/.env
-
+    # Carga las variables de entorno para el backend (JWT, Mongo URI)
     depends_on:
       # Ahora es un mapa clave-valor, no un elemento de lista.
       mongo:
         condition: service_healthy
 
+  # --------------------
+  # 3. Frontend Service (React/Vite)
+  # --------------------
   frontend:
     build:
       context: ./frontend
@@ -33,31 +40,8 @@ services:
     container_name: elmay-frontend
     environment:
       - NODE_ENV=production
-      # La URL ahora es relativa, ya que Nginx es el proxy
+      # La URL API es relativa, Nginx la interceptara y la enviara al backend
       - VITE_APP_API_URL=/api
-    depends_on:
-      - backend
 
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      
-  # --- Servicio de la Base de Datos (con persistencia física) ---
-  mongo:
-    image: mongo:4.4
-    container_name: elmay-mongodb
-    volumes:
-      - ./data/mongo:/data/db 
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
-    ports:
-      - "27017:27017"
-    
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-
+volumes:
+  mongo_data:
