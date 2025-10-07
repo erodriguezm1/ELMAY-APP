@@ -10,7 +10,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-     - ./nginx.conf:/etc/nginx/nginx.conf
+      # Monta el archivo de configuracion NGINX
+      - ./nginx.conf:/etc/nginx/nginx.conf
       # (Dejar deshabilitado por ahora) - ./certs:/etc/nginx/certs 
     depends_on:
       - frontend
@@ -25,10 +26,10 @@ services:
       dockerfile: Dockerfile
     container_name: elmay-backend
     # Carga las variables de entorno para el backend (JWT, Mongo URI)
+    env_file:
+      - ./backend/.env 
     depends_on:
-      # Ahora es un mapa clave-valor, no un elemento de lista.
-      mongo:
-        condition: service_healthy
+      - mongo
 
   # --------------------
   # 3. Frontend Service (React/Vite)
@@ -42,6 +43,34 @@ services:
       - NODE_ENV=production
       # La URL API es relativa, Nginx la interceptara y la enviara al backend
       - VITE_APP_API_URL=/api
+      
+      # ?? FIX VITE HMR (WebSocket) ??
+      - VITE_HMR_PROTOCOL=ws
+      - VITE_HMR_HOST=104.248.177.227 
+      - VITE_HMR_PORT=80
+      
+    depends_on:
+      - backend
+
+  # --------------------
+  # 4. MongoDB Service
+  # --------------------
+  mongo:
+    image: mongo:4.4
+    container_name: elmay-mongodb
+    volumes:
+      # Persistencia de datos
+      - mongo_data:/data/db 
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 volumes:
   mongo_data:
