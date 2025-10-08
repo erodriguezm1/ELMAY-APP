@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import AdminProductActions from './AdminProductActions.jsx'; // Importamos el componente de acciones de administración
 
 // URL de la API
-const API_URL = 'http://localhost:5000/api'; 
+const API_URL = '/api'; 
 
 // Función de utilidad para obtener datos del usuario de localStorage de manera segura y consistente
 const getUserData = () => {

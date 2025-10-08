@@ -39,7 +39,7 @@ function Home() {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('http://localhost:5000/api/products');
+                const response = await fetch('/api/products');
 
                 if (!response.ok) {
                     throw new Error(`Error: ${response.status} - ${response.statusText}`);

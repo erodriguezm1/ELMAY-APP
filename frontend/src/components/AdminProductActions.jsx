@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 // Usamos la URL por defecto para la API. 
-const API_URL = 'http://localhost:5000/api'; 
+const API_URL = '/api'; 
 
 const AdminProductActions = ({ product, onUpdate }) => {
     // Verificar si el producto existe para evitar errores.

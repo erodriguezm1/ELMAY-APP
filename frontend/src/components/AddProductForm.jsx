@@ -82,7 +82,7 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
 
 
     try {
-      const response = await axios.post('http://localhost:5000/api/products', payload, {
+      const response = await axios.post('/api/products', payload, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 

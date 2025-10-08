@@ -14,7 +14,7 @@ const AdminUserPanel = () => {
     // URL base de la API
     // Si tienes problemas de proxy (como recibir HTML), intenta cambiar esto a '/api/users' 
     // y configura tu servidor de desarrollo para redirigir esa ruta.
-    const API_URL = 'http://localhost:5000/api/users';
+    const API_URL = '/api/users';
 
     // Obtener el token directamente de localStorage
     const adminToken = localStorage.getItem('authToken');

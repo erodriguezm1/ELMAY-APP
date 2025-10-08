@@ -17,7 +17,7 @@ export async function authenticatedFetch(endpoint, options = {}) {
 
     // 2. Definir la URL base de la API (ajustar si es necesario)
     // Usamos el mismo patrón que se define en el entorno de Vite (VITE_APP_API_URL)
-    const BASE_URL = import.meta.env.VITE_APP_API_URL || 'http://backend:5000/api';
+    const BASE_URL = import.meta.env.VITE_APP_API_URL || '/api';
     
     // 3. Configurar los encabezados (Headers)
     const headers = {
