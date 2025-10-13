@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
-// Componente de modal de oferta emergente (Estilo Steam)
+// Componente de modal de oferta emergente con múltiples ofertas
 const MegaOfferModal = ({ show, onClose, offers }) => {
   const [offersToDisplay, setOffersToDisplay] = useState([]);
 
-  // Usamos useEffect para asegurarnos de que solo se muestren 3 ofertas y para manejar el estado
+  // Asegura que solo se muestren las primeras 3 ofertas (o las que existan)
+  // Esto es un buen UX para un modal emergente, que no debe ser demasiado grande.
   useEffect(() => {
     if (show && offers.length > 0) {
-      // Tomamos hasta 3 ofertas para un diseño limpio y enfocado en el pop-up
       setOffersToDisplay(offers.slice(0, 3));
     }
   }, [show, offers]);
     
-  // Si no se debe mostrar o no hay ofertas, no renderizar
+  // Si no se debe mostrar o no hay ofertas válidas, no renderizar
   if (!show || offersToDisplay.length === 0) return null;
-  
-  // Puedes añadir un estado de carga si lo deseas, aunque la data ya está filtrada en Home.jsx
   
   return (
     <div 
@@ -35,7 +33,7 @@ const MegaOfferModal = ({ show, onClose, offers }) => {
         </button>
 
         <div className="text-center">
-          <h2 className="text-4xl font-extrabold text-red-600 mb-6 animate-pulse">
+          <h2 className="text-4xl font-extrabold text-red-600 mb-6">
             💥 ¡MEGA OFERTAS EXCLUSIVAS! 💥
           </h2>
           
@@ -47,6 +45,7 @@ const MegaOfferModal = ({ show, onClose, offers }) => {
                   src={offer.imageUrl} 
                   alt={offer.name} 
                   className="w-24 h-24 object-cover rounded-md shadow-md flex-shrink-0"
+                  // Fallback por si la imagen no carga
                   onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x100/FEE2E2/DC2626?text=OFERTA"; }}
                 />
                 <div className="text-left flex-grow mt-2 sm:mt-0">
@@ -58,13 +57,19 @@ const MegaOfferModal = ({ show, onClose, offers }) => {
                 </div>
               </div>
             ))}
+            {/* Mensaje si hay más ofertas que las mostradas */}
+            {offers.length > offersToDisplay.length && (
+                <p className="text-sm text-gray-500 mt-2">
+                    ...y {offers.length - offersToDisplay.length} ofertas más!
+                </p>
+            )}
           </div>
           
           <button
             onClick={onClose}
             className="mt-6 px-8 py-3 bg-red-600 text-white font-bold rounded-full hover:bg-red-700 transition duration-200 shadow-lg uppercase tracking-wider"
           >
-            ¡Explorar Ofertas Ahora!
+            Ver Todas las Ofertas
           </button>
         </div>
       </div>

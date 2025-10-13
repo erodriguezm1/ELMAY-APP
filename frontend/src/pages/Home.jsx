@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Home.css';
-import axios from 'axios'; // ⬅️ IMPORTAR AXIOS
-import MegaOfferModal from '../components/MegaOfferModal'; // ⬅️ ¡IMPORTAR EL MODAL!
+import axios from 'axios';
+import MegaOfferModal from '../components/MegaOfferModal';
 
-// Mapeo de subcategorías (Asumiendo esta estructura para el ejemplo)
+// Mapeo de subcategorías (Se mantiene igual)
 const SUBCATEGORIES_MAP = {
     'Electrónica': ['Mouse', 'RAM', 'Disco Duro', 'Teclado', 'Smartphones', 'Televisores', 'Audio'],
     'Hogar': ['Muebles', 'Decoración', 'Cocina', 'Limpieza'],
@@ -13,7 +13,7 @@ const SUBCATEGORIES_MAP = {
     'Herramientas': ['Manuales', 'Eléctricas', 'Jardinería'],
 };
 
-// Datos estáticos para el menú de categorías
+// Datos estáticos para el menú de categorías (Se mantiene igual)
 const mainCategories = [
     'Electrónica', 
     'Hogar', 
@@ -31,33 +31,49 @@ function Home() {
     const [selectedCategory, setSelectedCategory] = useState('Todos');
     const [selectedSubcategory, setSelectedSubcategory] = useState(null);
 
-    // NUEVOS ESTADOS PARA FILTROS
-    const [searchTerm, setSearchTerm] = useState('');
-    const [priceRange, setPriceRange] = useState([0, 5000]); // Ejemplo de rango de precio
+    // ✅ CAMBIO 1: El valor máximo ya no es una constante, es un estado
+    const [maxPriceLimit, setMaxPriceLimit] = useState(0); 
+    // ✅ CAMBIO 2: Inicializamos el rango de precio a [0, 0]
+    const [priceRange, setPriceRange] = useState([0, 0]); 
     
-    // 💥 AÑADIDO: ESTADOS PARA MEGA OFERTAS Y MODAL
+    // Estados de Mega Ofertas y Modal (Se mantienen)
     const [megaOffers, setMegaOffers] = useState([]); 
     const [showMegaOfferModal, setShowMegaOfferModal] = useState(false);
-    // ----------------------------------------
+    const [searchTerm, setSearchTerm] = useState('');
     
     // Función central para obtener los productos
     const fetchProducts = async () => {
         setLoading(true);
         setError(null);
         try {
-            // ASUMIMOS: Esta llamada devuelve TODOS los productos activos
             const response = await axios.get('/api/products'); 
             const allProducts = response.data;
             
             setProducts(allProducts);
 
-            // --- 💥 AÑADIDO: LÓGICA DE FILTRADO DE MEGA OFERTAS (Client-Side) ---
+            // --- ✅ LÓGICA DE PRECIO DINÁMICO ---
+            let maxPrice = 0;
+            if (allProducts.length > 0) {
+                // Busca el precio más alto en la lista de productos
+                maxPrice = Math.max(...allProducts.map(p => p.price));
+            }
+            // Asegura que el límite sea al menos un valor mínimo si no hay productos, o un valor redondeado
+            const dynamicMax = Math.ceil(maxPrice / 100) * 100; // Redondeamos al 100 más cercano por estética, o simplemente Math.ceil(maxPrice);
+            if(dynamicMax === 0) {
+                // Caso sin productos, o todos a precio 0
+                setMaxPriceLimit(1000); 
+                setPriceRange([0, 1000]); 
+            } else {
+                setMaxPriceLimit(dynamicMax);
+                setPriceRange([0, dynamicMax]); // Establecemos el rango superior al máximo encontrado
+            }
+            // ----------------------------------------
+
+            // Lógica de filtrado de Mega Ofertas (Se mantiene)
             const megaOffersList = allProducts.filter(product => 
-                // Filtramos por la propiedad booleana 'isMegaOffer'
                 product.isMegaOffer === true
             );
             setMegaOffers(megaOffersList);
-            // --------------------------------------------------------
 
         } catch (err) {
             setError('Error al cargar los productos. Por favor, intenta de nuevo.');
@@ -67,43 +83,37 @@ function Home() {
         }
     };
     
-    // useEffect para la carga inicial de productos
+    // useEffect para la carga inicial de productos (Se mantiene)
     useEffect(() => {
         fetchProducts();
     }, []); 
     
-    // 💥 NUEVO useEffect: para manejar la aparición del Modal (después de cargar la data)
+    // NUEVO useEffect: para manejar la aparición del Modal (Se mantiene)
     useEffect(() => {
         const hasBeenShown = sessionStorage.getItem('megaOfferModalShown') === 'true';
         
-        // Si hay ofertas, no se ha mostrado antes, y ya no estamos cargando
         if (megaOffers.length > 0 && !hasBeenShown && !loading && !error) {
             setShowMegaOfferModal(true); 
             sessionStorage.setItem('megaOfferModalShown', 'true');
         }
-    }, [megaOffers, loading, error]); // Se dispara cuando las ofertas se cargan
-
+    }, [megaOffers, loading, error]); 
     
-    // Lógica para filtrar los productos a mostrar
+    
+    // Lógica para filtrar los productos a mostrar (Se mantiene)
     const productsToDisplay = products
         .filter(product => {
-            // 💥 AÑADIDO: Filtro por Mega Oferta
-            if (selectedCategory === 'Mega Ofertas') {
-                return product.isMegaOffer === true;
-            }
-            // 💥 AÑADIDO: Filtro por Oferta
-            if (selectedCategory === 'Ofertas') {
-                // Asumimos que también tienes la propiedad isOffer
-                return product.isOffer === true;
-            }
             
-            // Lógica existente para filtrar por categoría y subcategoría
-            if (selectedCategory !== 'Todos' && selectedCategory !== 'Ofertas' && selectedCategory !== 'Mega Ofertas') {
+            // 1. FILTRO POR TIPO DE OFERTA/CATEGORÍA ESPECIAL (Se mantiene)
+            if (selectedCategory === 'Mega Ofertas') {
+                if (product.isMegaOffer !== true) return false;
+            } else if (selectedCategory === 'Ofertas') {
+                if (product.isOffer !== true) return false;
+            } else if (selectedCategory !== 'Todos') {
                 if (product.category !== selectedCategory) return false;
                 if (selectedSubcategory && product.subcategory !== selectedSubcategory) return false;
             }
             
-            // Filtro por término de búsqueda (ejemplo)
+            // 2. FILTRO DE BÚSQUEDA (Se mantiene)
             if (searchTerm) {
                 const lowerCaseSearchTerm = searchTerm.toLowerCase();
                 if (
@@ -114,12 +124,12 @@ function Home() {
                 }
             }
 
-            // Filtro por rango de precio (ejemplo)
+            // 3. FILTRO POR RANGO DE PRECIO (Se mantiene)
+            // Se utiliza priceRange[1] para el límite superior
             if (product.price < priceRange[0] || product.price > priceRange[1]) {
                 return false;
             }
             
-            // Por defecto, muestra todos los que pasen los filtros
             return true;
         });
     
@@ -130,31 +140,27 @@ function Home() {
 
     return (
         <div className="home-container">
-            {/* 💥 AÑADIDO: INTEGRACIÓN DEL MODAL AQUÍ */}
             <MegaOfferModal 
                 show={showMegaOfferModal} 
                 onClose={() => setShowMegaOfferModal(false)}
-                offers={megaOffers} // Le pasamos la lista de mega ofertas
+                offers={megaOffers}
             />
             
-            {/* 1. SECCIÓN DE CATEGORÍAS */}
+            {/* 1. SECCIÓN DE CATEGORÍAS (Se mantiene) */}
             <section className="categories-menu-container">
                 <div className="category-buttons-list">
-                    {/* Botón para 'Todos' */}
                     <button
                         className={`category-button ${selectedCategory === 'Todos' ? 'active' : ''}`}
                         onClick={() => handleCategoryClick('Todos')}
                     >
                         Todos
                     </button>
-                    {/* 💥 AÑADIDO: Botón para 'Mega Ofertas' */}
                     <button
                         className={`category-button ${selectedCategory === 'Mega Ofertas' ? 'active' : ''}`}
                         onClick={() => handleCategoryClick('Mega Ofertas')}
                     >
                         💥 MEGA OFERTAS
                     </button>
-                    {/* 💥 AÑADIDO: Botón para 'Ofertas' */}
                     <button
                         className={`category-button ${selectedCategory === 'Ofertas' ? 'active' : ''}`}
                         onClick={() => handleCategoryClick('Ofertas')}
@@ -162,7 +168,6 @@ function Home() {
                         🔥 Ofertas
                     </button>
 
-                    {/* El resto de tus botones de categorías principales */}
                     {mainCategories.map((category) => (
                         <button
                             key={category}
@@ -175,10 +180,40 @@ function Home() {
                 </div>
             </section>
             
-            {/* 2. El resto de la página Home */}
+            {/* ✅ SECCIÓN DE FILTROS ACTUALIZADA */}
+            <section className="filter-bar-container mt-8 flex flex-col md:flex-row gap-4 justify-center items-center p-4 bg-white rounded-lg shadow-md">
+                {/* ✅ CORRECCIÓN: Usar 2/3 para que ocupe el doble de espacio (66.66%) */}
+                <div className="search-filter w-full md:w-2/3">
+                    <input 
+                        type="text" 
+                        placeholder="Buscar por nombre o descripción..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+                {/* Se mantiene en 1/3 (33.33%). La suma es 2/3 + 1/3 = 100% */}
+                <div className="price-range-filter w-full md:w-1/3">
+                    {/* El límite superior de la etiqueta y el slider es dinámico: maxPriceLimit */}
+                    <label className="block text-gray-700 font-semibold mb-1">Precio Máximo: ${priceRange[1].toFixed(2)}</label>
+                    <input
+                        type="range"
+                        min="0"
+                        max={maxPriceLimit} 
+                        step="1"
+                        value={priceRange[1]}
+                        onChange={(e) => setPriceRange([0, Number(e.target.value)])} 
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg"
+                        // Deshabilitar si todavía está cargando
+                        disabled={loading || maxPriceLimit === 0}
+                    />
+                </div>
+            </section>
+            
+            {/* 2. El resto de la página Home (Se mantiene) */}
             <h1 className="main-title">Explora Nuestros Productos</h1>
             
-            {/* 3. Seccion del Grid de Productos (Asegúrate que tu JSX para mostrar productos es similar a esto) */}
+            {/* 3. Seccion del Grid de Productos (Se mantiene) */}
             <section className="product-listing-section">
                 <h2 className="section-title">
                     {selectedCategory === 'Todos' ? 'Todos los Productos' : 
@@ -205,6 +240,9 @@ function Home() {
                                     <div className="product-details">
                                         <span className="product-price">${product.price.toFixed(2)}</span>
                                         <span className="product-stock">Stock: {product.stock}</span>
+                                        {/* Indicador visual para las ofertas/mega ofertas */}
+                                        {product.isMegaOffer && <span className="text-red-600 font-bold ml-2">💥 Mega Oferta</span>}
+                                        {!product.isMegaOffer && product.isOffer && <span className="text-orange-500 font-bold ml-2">🔥 Oferta</span>}
                                     </div>
                                 </div>
                             </div>
