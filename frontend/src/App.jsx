@@ -76,7 +76,9 @@ function App() {
         offerDetails={megaOffer}
       />
       <SessionTimeout />
-      <Header user={user} onLogout={onLogout} />
+      <div className="header-fixed-container"> 
+        <Header user={user} onLogout={onLogout} />
+      </div>
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />

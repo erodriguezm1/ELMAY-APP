@@ -1,3 +1,5 @@
+/* ELMAY-APP/frontend/src/pages/Home.css */
+
 /* Contenedor principal para la página */
 .home-container {
     font-family: 'Inter', Arial, sans-serif;
@@ -18,464 +20,466 @@
     border-bottom: 3px solid #007bff;
 }
 
-/* --- SECCIÓN DE CATEGORÍAS --- */
-
-.categories-menu-container {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    margin-bottom: 40px;
-}
-
-.category-buttons-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-}
-
-/* ESTILOS PARA EL DROPDOWN DE SUBCATEGORÍAS */
-
-.category-dropdown-wrapper {
-    position: relative; /* Contenedor para posicionar el dropdown */
-    /* El wrapper debe ser inline-block para no ocupar todo el ancho si estamos en flex */
-    display: inline-block; 
-}
-
-/* Estilo para el botón principal de categoría */
-.category-button {
-    background-color: #f0f0f0;
-    color: #333;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-size: 1em;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
-    white-space: nowrap; /* Evitar que el texto del botón se rompa */
-}
-
-.category-button:hover,
-.category-dropdown-wrapper:hover .category-button { /* Mantiene el estilo hover en el botón padre */
-    background-color: #ddd;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-}
-
-.category-button.active {
-    background-color: #007bff;
-    color: white;
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
-    transform: translateY(-2px);
-}
-
-/* Estilo para la categoría padre que tiene una subcategoría activa */
-.category-button.active-parent {
-    background-color: #0099ff; /* Un azul ligeramente diferente para indicar que es el padre de una selección */
-    color: white;
-}
-
-
-.subcategory-dropdown {
-    display: none; /* Inicialmente oculto */
-    position: absolute;
-    top: 100%; /* Posicionamiento debajo del botón principal */
-    left: 50%;
-    transform: translateX(-50%); /* Centrar el dropdown */
-    z-index: 50; /* Sobreponerse a otros elementos */
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    padding: 10px;
-    min-width: 180px;
-    /* FIX: Se eliminó margin-top: 5px; para evitar la "zona muerta" que hacía desaparecer el menú al mover el mouse. */
-    text-align: left;
-    white-space: nowrap;
-}
-
-/* Mostrar el dropdown cuando el usuario pasa el mouse sobre el wrapper */
-.category-dropdown-wrapper:hover .subcategory-dropdown {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.subcategory-button {
-    background-color: transparent;
-    border: none;
-    padding: 8px 10px;
-    text-align: left;
-    cursor: pointer;
-    font-size: 0.95em;
-    color: #555;
-    border-radius: 5px;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.subcategory-button:hover {
-    background-color: #f0f0f0;
-    color: #007bff;
-}
-
-.subcategory-button.active {
-    background-color: #007bff;
-    color: white;
-    font-weight: bold;
-}
-
-
-/* --- NUEVA SECCIÓN: BARRA DE FILTROS (Búsqueda y Precio) --- */
-.filter-bar-container {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    padding: 20px;
-    margin-bottom: 40px;
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-/* 1. ESTILOS DEL BUSCADOR */
-.search-filter-wrapper {
-    flex-grow: 1; /* Ocupa el espacio disponible */
-}
-
-.search-input {
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #ddd;
-    border-radius: 25px;
-    font-size: 1em;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.search-input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-    outline: none;
-}
-
-/* 2. ESTILOS DEL FILTRO DE PRECIOS */
-.price-range-filter {
-    width: 100%; /* Ocupa todo el ancho en el layout de columna */
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 0 10px;
-}
-
-.price-label {
-    font-weight: 600;
-    font-size: 1.1em;
-    color: #34495e;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.current-price-display {
-    background-color: #007bff;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 1em;
-    font-weight: 700;
-}
-
-.range-slider {
-    -webkit-appearance: none; /* Override default look */
-    appearance: none;
-    width: 100%; 
-    height: 8px;
-    background: #ddd;
-    border-radius: 5px;
-    outline: none;
-    transition: opacity .2s;
-}
-
-.range-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%; 
-    background: #007bff;
-    cursor: pointer;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    transition: background 0.3s;
-}
-
-.range-slider::-webkit-slider-thumb:hover {
-    background: #0056b3;
-}
-
-.price-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9em;
-    color: #666;
-    margin-top: -5px; /* Ajuste visual */
-}
-/* FIN NUEVA SECCIÓN DE FILTROS */
-
-
-/* --- SECCIÓN DE OFERTAS DESTACADAS --- */
-
-.featured-offers-section {
-    margin-bottom: 40px;
-    padding: 20px;
-    border: 2px solid #ff4500; /* Naranja rojizo */
-    background-color: #fffaf0; /* Fondo muy claro para destacar */
-    border-radius: 15px;
-    box-shadow: 0 6px 20px rgba(255, 69, 0, 0.15);
-}
-
-.section-title-offer {
-    text-align: center;
-    font-size: 2.2em;
-    color: #ff4500;
-    margin-bottom: 25px;
-    font-weight: 800;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-}
-
-.offer-card {
-    position: relative;
-    border: 3px solid #ff4500;
-    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
-    overflow: hidden;
-    transition: transform 0.3s ease;
-    animation: pulse-border 1.5s infinite alternate; /* Animación para llamar la atención */
-}
-
-@keyframes pulse-border {
-    from { box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3); }
-    to { box-shadow: 0 5px 25px rgba(255, 69, 0, 0.6); }
-}
-
-.offer-badge {
-    position: absolute;
-    top: 15px;
-    right: -20px;
-    background-color: #ffc107; /* Amarillo */
-    color: #333;
-    padding: 5px 25px;
-    font-weight: bold;
-    transform: rotate(45deg);
-    font-size: 0.9em;
-    z-index: 10;
-}
-
-.original-price {
-    text-decoration: line-through;
-    color: #999;
-    font-size: 0.9em;
-    margin-right: 10px;
-}
-
-.offer-price {
-    color: #ff4500;
-    font-size: 1.8em;
-    font-weight: bold;
-}
-
-.view-details-button {
-    display: block;
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-    text-align: center;
-    text-decoration: none;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-.view-details-button:hover {
-    background-color: #0056b3;
-}
-
-/* --- SECCIÓN DE PRODUCTOS GENERALES Y GRID --- */
-
-.section-title {
-    font-size: 1.8em;
-    color: #34495e;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-}
-
-.general-products-section {
-    margin-top: 30px;
-}
+/* -------------------------------------------------------- */
+/* 🟢 INICIO: MEJORAS AL CONTENIDO CENTRAL (Productos)       */
+/* -------------------------------------------------------- */
 
 .product-grid {
+    /* 🎯 MEJORA SIMETRÍA: Asegura que en pantallas grandes se vean 3 o 4 columnas */
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 30px;
+    padding-top: 20px;
+}
+.general-products-section {
+    margin-bottom: 40px;
+}
+.general-products-section .section-title {
+    font-size: 1.8em;
+    color: #34495e; /* Azul oscuro elegante */
+    margin-bottom: 15px;
+    padding-left: 5px;
+    border-left: 5px solid #007bff;
 }
 
+/* Tarjeta de Producto (Central) */
 .product-card {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
+    background-color: white;
     border-radius: 12px;
+    /* 🎯 MEJORA ESTÉTICA: Sombra más suave y elegante */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    /* Borde sutil para simetría */
+    border: 1px solid #e0e0e0; 
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
-
 .product-card:hover {
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    transform: translateY(-5px);
+    /* 🎯 MEJORA DINAMISMO: Elevación atractiva */
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border-color: #007bff; /* Borde de color primario al hacer hover */
 }
 
+/* Área de Imagen */
 .product-image {
     width: 100%;
-    height: 200px;
+    /* 🎯 MEJORA SIMETRÍA: Usar aspect-ratio o padding-bottom para ser cuadrado */
+    aspect-ratio: 1 / 1; 
     object-fit: cover;
-    border-bottom: 1px solid #eee;
+    display: block;
+    border-bottom: 1px solid #f0f0f0;
 }
 
+/* Información del Producto */
 .product-info {
     padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
-
 .product-info h3 {
-    font-size: 1.2em;
+    font-size: 1.3em;
     margin-top: 0;
-    margin-bottom: 5px;
-    color: #34495e;
-    font-weight: 700;
-}
-
-.product-category-tag { /* Nuevo estilo para la etiqueta de categoría/subcategoría */
-    font-size: 0.85em;
-    color: #555;
-    display: block;
     margin-bottom: 8px;
-    background-color: #f0f0f0;
-    padding: 3px 6px;
-    border-radius: 5px;
-    width: fit-content;
+    color: #2c3e50; /* Azul más oscuro y elegante */
+    font-weight: 600;
 }
-
-.product-description {
-    color: #7f8c8d;
-    font-size: 0.9em;
+.product-category-tag {
+    font-size: 0.8em;
+    color: #666;
+    background-color: #f2f4f6;
+    padding: 3px 8px;
+    border-radius: 4px;
+    align-self: flex-start;
     margin-bottom: 10px;
-    max-height: 40px;
-    overflow: hidden;
 }
-
+.product-description {
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 15px;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Menos líneas para más limpieza */
+    -webkit-box-orient: vertical;
+}
 .product-details {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 10px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
 }
-
 .product-price {
-    font-size: 1.5em;
-    color: #27ae60; /* Verde para precios */
-    font-weight: bold;
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #2ecc71; /* Verde más sutil y elegante */
 }
-
 .product-stock {
+    font-size: 0.85em;
+    color: #888;
+}
+
+/* 🎯 MEJORA VISUAL: Estilos para indicadores de oferta en el centro */
+.product-details .text-red-600 {
+    color: #e74c3c; /* Rojo de Mega Oferta */
+    font-weight: 700;
+    background-color: #fcebeb;
+    padding: 3px 8px;
+    border-radius: 4px;
     font-size: 0.9em;
-    color: #999;
-    padding: 5px 10px;
-    background-color: #f9f9f9;
-    border-radius: 5px;
+}
+.product-details .text-orange-500 {
+    color: #f39c12; /* Naranja de Oferta */
+    font-weight: 700;
+    background-color: #fff9e6;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
 }
 
-.no-products-message {
-    text-align: center;
-    padding: 40px;
-    font-size: 1.1em;
-    color: #e74c3c;
-    background-color: #fff0f0;
-    border: 1px dashed #e74c3c;
-    border-radius: 10px;
-    margin-top: 20px;
+/* -------------------------------------------------------- */
+/* 🟢 FIN: MEJORAS AL CONTENIDO CENTRAL (Productos)         */
+/* -------------------------------------------------------- */
+
+
+/* --- ESTILOS DE LA BARRA DE FILTROS (IZQUIERDA) --- */
+
+/* 🟢 ESTILOS BASE PARA EL LAYOUT DE PÁGINA (Tres columnas) */
+.home-page-layout {
+    position: relative;
+    display: flex; 
 }
 
-/* ESTILOS DE ESTADO (Carga y Error) */
-.loading, .error {
-    text-align: center;
-    padding: 50px;
-    font-size: 1.2em;
-    margin: 50px auto;
+/* 2. Estilos base para ambas Sidebars Fijas */
+.fixed-sidebar {
+    position: fixed;
+    top: 80px; 
+    height: calc(100vh - 80px); 
+    background-color: #f8f8f8; 
+    z-index: 900; 
+    overflow-y: auto; 
+    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+    padding: 20px 15px; 
+}
+
+/* 2.1 BARRA LATERAL IZQUIERDA: FILTROS (Ocultable - 280px) */
+.fixed-sidebar-left {
+    left: 0;
+    width: 280px; 
+    box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    display: block; 
+}
+
+/* Estilos de lista vertical para categorías */
+.fixed-sidebar-left .categories-menu-container {
+    background-color: #fff;
+    padding: 0; 
+    margin-bottom: 20px;
     border-radius: 8px;
-    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.fixed-sidebar-left .categories-menu-container h2 {
+    padding: 15px 15px 10px;
+    margin-bottom: 0;
+    border-bottom: 1px solid #eee;
 }
 
-.loading {
+/* Contenedor de botones: vuelve a ser un bloque vertical */
+.fixed-sidebar-left .category-buttons-list {
+    display: block; 
+    padding: 0;
+}
+
+.fixed-sidebar-left .category-dropdown-wrapper {
+    display: block;
+    margin-bottom: 0; 
+}
+
+.fixed-sidebar-left .category-button {
+    width: 100%; 
+    text-align: left;
+    padding: 12px 15px; 
+    border-radius: 0; 
+    border: none;
+    border-bottom: 1px solid #eee;
+    background-color: transparent;
+    color: #333;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+.fixed-sidebar-left .category-button:hover {
+    background-color: #f0f0f0;
     color: #007bff;
-    background-color: #e0f7ff;
-    border: 1px solid #007bff;
 }
 
-.error {
-    color: #e74c3c;
-    background-color: #fdd;
-    border: 1px solid #e74c3c;
+/* Estilos de activo (Botones de categorías principales) */
+.fixed-sidebar-left .category-button.active,
+.fixed-sidebar-left .category-button.active-parent {
+    background-color: #007bff;
+    color: white;
+    font-weight: 700;
+}
+.fixed-sidebar-left .category-button.active-parent {
+    background-color: #0099ff; 
+}
+
+/* Estilos para el Dropdown de Subcategorías */
+.fixed-sidebar-left .subcategory-dropdown {
+    display: block;
+    padding: 5px 0;
+    background-color: #f8f8f8;
+    border-top: 1px solid #e0e0e0;
+}
+
+.fixed-sidebar-left .subcategory-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 15px 8px 30px; 
+    font-size: 0.9em;
+    background-color: transparent;
+    color: #555;
+    border: none;
+    transition: color 0.2s;
+}
+.fixed-sidebar-left .subcategory-button:hover {
+    color: #007bff;
+}
+.fixed-sidebar-left .subcategory-button.active {
+    color: #007bff;
+    font-weight: 600;
+    background-color: #e6f2ff;
+}
+
+/* Estilos de las secciones internas (Filter bar) para la lista */
+.fixed-sidebar-left .filter-bar-container {
+    padding: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 15px; 
+    margin-bottom: 20px; 
+}
+
+/* 3. Estilo para OCULTAR el Sidebar IZQUIERDO */
+.home-page-layout.sidebar-left-closed .fixed-sidebar-left {
+    transform: translateX(-100%); 
+    box-shadow: none;
+}
+
+/* 4. Estilos para el Contenido Principal (El Centro) */
+.main-content-scrollable {
+    flex-grow: 1; 
+    padding: 20px;
+    
+    max-width: 1000px; 
+    margin-left: 280px; 
+    margin-right: 350px; 
+    
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* 5. Botón de Toggle para Sidebar IZQUIERDO */
+.sidebar-toggle-button.sidebar-toggle-left {
+    position: fixed;
+    top: 90px; 
+    left: 280px; 
+    right: auto; 
+    z-index: 950;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 0 8px 8px 0; 
+    cursor: pointer;
+    font-weight: 600;
+    transition: left 0.3s ease-in-out;
+}
+
+.home-page-layout.sidebar-left-closed .sidebar-toggle-button.sidebar-toggle-left {
+    left: 0; 
+}
+
+/* --- FIN ESTILOS DE BARRA IZQUIERDA --- */
+
+
+/* -------------------------------------------------------- */
+/* 🟢 BARRA DERECHA: MEJORA ESTÉTICA DE LA BARRA DERECHA (OFERTAS) */
+/* -------------------------------------------------------- */
+
+
+/* 2.2 BARRA LATERAL DERECHA: OFERTAS (Fija - 350px) */
+.fixed-sidebar-right {
+    right: 0;
+    width: 350px; 
+    /* MEJORA: Fondo más llamativo para la barra de ofertas */
+    background: linear-gradient(180deg, #fffaf3, #fff6ee); /* Suave fondo crema/naranja */
+    box-shadow: -4px 0 15px rgba(255, 69, 0, 0.2); /* Sombra más fuerte y cálida */
+    left: auto; 
 }
 
 
-/* RESPONSIVE */
-@media (min-width: 769px) {
-    /* En escritorio, que la barra de filtros sea horizontal */
-    .filter-bar-container {
-        flex-direction: row;
-        align-items: center;
-    }
-    .price-range-filter {
-        max-width: 300px; /* Limitar el ancho del slider */
-    }
+/* 🟢 AJUSTES DE LAS SECCIONES DENTRO DEL SIDEBAR DERECHO (Ofertas Fijas) */
+
+/* Título de la sección de Ofertas: ¡OFERTAS IMPERDIBLES! */
+.fixed-offers-sidebar .featured-offers-section {
+    padding-top: 0;
+}
+.section-title-offer {
+    /* Título más grande, negrita y pegajoso */
+    position: sticky;
+    top: -20px; /* Sube para que se pegue justo debajo del header */
+    z-index: 910;
+    text-align: center;
+    font-size: 2em;
+    font-weight: 900;
+    color: #cc0000; /* Rojo vibrante */
+    background-color: #ffddc2; /* Fondo para el título */
+    padding: 15px 0;
+    margin-bottom: 20px;
+    border-bottom: 4px solid #cc0000;
+    box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.1);
 }
 
+.product-grid.offer-grid {
+    grid-template-columns: 1fr; 
+    gap: 25px; /* Más espacio entre ofertas */
+}
 
+/* Tarjeta de Oferta (offer-card) */
+.offer-card {
+    position: relative;
+    background-color: white; /* Asegura un fondo blanco limpio */
+    border: 2px solid #ff7f50; /* Borde naranja coral */
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(255, 69, 0, 0.3); /* Sombra intensa y cálida */
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.offer-card:hover {
+    transform: translateY(-5px) scale(1.01); /* Efecto 3D sutil al pasar el ratón */
+    box-shadow: 0 12px 25px rgba(255, 69, 0, 0.4);
+}
+
+/* Insignia de Oferta (offer-badge) */
+.offer-badge {
+    position: absolute;
+    top: 10px;
+    right: -10px;
+    background-color: #ff004c; /* Rosa/rojo neón */
+    color: white;
+    padding: 5px 15px;
+    font-weight: 900;
+    font-size: 1em;
+    letter-spacing: 0.5px;
+    transform: rotate(10deg); /* Rotación para mayor dinamismo */
+    z-index: 10;
+    border-radius: 0 0 0 5px;
+    box-shadow: -2px 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Contenido de la tarjeta de oferta */
+.offer-card .product-image {
+    aspect-ratio: 16 / 9; /* La imagen de la oferta es más horizontal */
+    height: auto;
+}
+.offer-card .product-description {
+    min-height: 20px;
+    -webkit-line-clamp: 1; 
+}
+.offer-card .product-details {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 15px 15px;
+    gap: 5px;
+}
+.offer-card .original-price {
+    font-size: 0.9em;
+    color: #a0a0a0;
+    text-decoration: line-through; /* CLAVE: Tachado claro */
+    margin-bottom: -5px; 
+}
+.offer-card .product-price.offer-price {
+    /* MEJORA: Precio de oferta grande y destacado */
+    font-size: 1.8em; 
+    color: #cc0000; /* Rojo de descuento */
+    font-weight: 800;
+}
+
+/* Botón de Ver Detalle */
+.offer-card .product-details .view-details-button {
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+    background-color: #ff6600; /* Naranja de acción */
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    transition: background-color 0.2s;
+}
+.offer-card .product-details .view-details-button:hover {
+    background-color: #e65c00;
+}
+
+/* ------------------------------------------------------ */
+/* 🟢 FIN: BARRA DERECHA (OFERTAS) */
+/* ------------------------------------------------------ */
+
+
+/* 🟢 AJUSTES RESPONSIVE (Móvil) */
 @media (max-width: 768px) {
-    .product-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    }
-    .main-title {
-        font-size: 2.2em;
-    }
-    .category-buttons-list {
-        /* Permitimos que se envuelvan, pero quitamos el gap de 10px y centramos */
-        justify-content: center;
-        gap: 8px;
-    }
-    .categories-menu-container {
-        padding: 15px;
-    }
-    .category-button {
-        padding: 8px 15px;
-        font-size: 0.9em;
-    }
-    .section-title-offer {
-        font-size: 1.8em;
+    /* Se mantienen los ajustes móviles de la versión anterior */
+    .fixed-offers-sidebar {
+        width: 80%; 
+        transform: translateX(100%); 
+        /* En móvil, la barra de ofertas tiene un fondo más simple */
+        background: #f8f8f8;
+        box-shadow: none;
     }
     
-    /* En móvil, los dropdowns se desactivan por hover y se ocultan */
-    .category-dropdown-wrapper {
-        /* Para que el wrapper ocupe solo el espacio necesario en el flexbox horizontal */
-        display: inline-block; 
+    .fixed-sidebar-left {
+        width: 80%; 
+        transform: translateX(-100%); 
     }
 
-    .subcategory-dropdown {
-        /* Ocultar en móvil, ya que el hover no funciona bien en pantallas táctiles */
-        display: none !important; 
+    .home-page-layout.sidebar-left-open .fixed-sidebar-left {
+        transform: translateX(0);
     }
-}
-
-@media (max-width: 500px) {
+       
+    .main-content-scrollable {
+        margin-left: 0; 
+        margin-right: 0; 
+        max-width: 100%;
+        padding: 10px;
+    }
+    
+    .sidebar-toggle-button.sidebar-toggle-left {
+        top: 80px; 
+        left: 0; 
+        border-radius: 0 8px 8px 0;
+    }
+    .home-page-layout.sidebar-left-closed .sidebar-toggle-button.sidebar-toggle-left {
+        left: 0; 
+    }
+    
+    /* Ajuste de la rejilla principal en móvil */
     .product-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+    }
+    
+    .product-card {
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Sombra más sutil en móvil */
+        border: 1px solid #e0e0e0;
+    }
+    
+    .offer-card .product-image {
+        aspect-ratio: 4 / 3;
     }
 }
