@@ -60,9 +60,11 @@ function Header() {
   return (
     <header className="main-header">
       <Link className="logo-header" to="/">
-         <img src="../../static/index/image/elmay-logo.webp" alt="Logo de ELMAY" className="logo" />
-        <span className="site-name">ELMAY</span>
-        <span className="site-desc">Venta de productos y servicios</span>
+         <img src="../../static/index/image/logo-totalmente-transparente.png" alt="Logo de ELMAY" className="logo" />
+        <div className="logo-text-container"> {/* 🎯 CONTENEDOR NUEVO PARA ALINEACIÓN */}
+          <span className="site-name">ELMAY</span>
+          <span className="site-desc">Venta de productos y servicios</span>
+        </div>
       </Link>
       <nav>
         <ul className='ul-nav'>

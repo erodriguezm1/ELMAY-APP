@@ -1,104 +1,162 @@
 /* ELMAY-APP/frontend/src/components/Header.css */
+
+/* -------------------------------------------------------- */
+/* 🟢 HEADER PRINCIPAL (Diseño Negro y Grueso) */
+/* -------------------------------------------------------- */
 .main-header {
-    background: #333;
-    color: white;
-    height: 80px;
-    padding: 0 20px;
+    background: #222; 
+    color: white; 
+    height: 80px; /* Altura del Header (80px) */
+    padding: 0 40px; 
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    position: sticky; 
+    top: 0;
+    z-index: 100; 
 }
+    
     .main-header a, .main-header button {
-        color: white;
+        color: white; 
     }
+
+/* -------------------------------------------------------- */
+/* 🟢 LOGO Y NOMBRE DEL SITIO (Ajuste para logo transparente) */
+/* -------------------------------------------------------- */
 .main-header .logo-header {
     display: flex;
     text-decoration: none;
     padding: 0;
-    align-items: center;
-    gap: 10px;
+    align-items: center; /* CLAVE: align-items ya centra el logo y el texto */
+    gap: 12px;
 }
     .main-header .logo-header:hover {
-        color: #0b76a6;
+        color: #007bff;
     }
     .main-header .logo-header .site-name {
         display: block;
-        font-weight: 700;
-        font-size: 1.2em;
+        font-weight: 900;
+        font-size: 1.6em;
+        color: #007bff;
+        line-height: 1.2; 
+        text-shadow: 1px 1px 2px rgba(0, 123, 255, 0.4);
     }
     .main-header .logo-header .site-desc {
         display: block;
-        font-weight: 300;
+        font-weight: 400;
         font-size: 0.8em;
-        color: #999;
+        color: #aaa;
+        line-height: 1.2;
+    }
+    .main-header .logo-text-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     .main-header .logo-header .logo {
         display: block;
-        height: 40px;
+        height: 60px; 
         width: auto;
+        
+        /* 🎯 CLAVE: Añadir fondo blanco y padding al logo */
+        background-color: white; /* Fondo blanco */
+        border-radius: 8px; /* Esquinas ligeramente redondeadas para un look moderno */
+        
+        /* Mantener el filtro para la sombra si es necesario, o quitarlo si el fondo blanco ya es suficiente */
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)); 
     }
-/* Estilos para la barra de navegación principal */
+
+/* -------------------------------------------------------- */
+/* 🟢 NAVEGACIÓN PRINCIPAL (Alineación Vertical con line-height) */
+/* -------------------------------------------------------- */
 .main-header nav .ul-nav {
     margin: 0;
     padding: 0;
     list-style: none;
     display: flex;
+    align-items: center;
+    gap: 10px;
 }
-    .main-header nav .ul-nav li .dropdown-menu li {
-        line-height: 39.2px; /* Se corrige para que coincida con la altura del header */
-    }
     .main-header nav .ul-nav li {
-        line-height: 80px; /* Se corrige para que coincida con la altura del header */
+        line-height: normal;
     }
-        /* Estilos generales para todos los enlaces y botones dentro de la navegación */
-
         .main-header nav .ul-nav li .a-nav,
         .main-header nav .ul-nav li .user-name {
             display: block;
-            padding: 0 10px;
+            padding: 0 15px;
             text-decoration: none;
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1em;
-            color: white;
+            font-size: 1.05em;
+            color: #eee;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            height: 80px; 
+            line-height: 80px;
         }
-            /* Estado hover para enlaces y botones */
             .main-header nav .ul-nav li .a-nav:hover,
             .main-header nav .ul-nav li .user-name:hover {
-                background: #0b76a6;
+                background: #333;
+                color: #007bff; 
+                border-bottom: 3px solid #007bff; 
             }
-        .main-header nav .ul-nav li .user-name {
-            padding-top: 15px;
-        }
-/* Estilo para el nombre de usuario */
-.main-header .user-name {
-    padding: 0 10px;
-    font-weight: 500;
-    color: #e0e0e0;
+        
+.main-header nav .ul-nav li .button-nav {
+    display: block;
+    padding: 0 15px;
+    background-color: transparent;
+    color: #eee;
+    border: none;
     cursor: pointer;
+    font-size: 1.05em;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    height: 80px; 
+    line-height: 80px;
+}
+.main-header nav .ul-nav li .button-nav:hover {
+    background: #333;
+    color: #007bff; 
+    border-bottom: 3px solid #007bff;
 }
 
-/* --- ESTILOS PARA EL MENÚ DESPLEGABLE --- */
+/* -------------------------------------------------------- */
+/* 🟢 DROPDOWN DE USUARIO (Diseño Invertido: Oscuro) */
+/* -------------------------------------------------------- */
 .user-dropdown {
     position: relative;
-    /* Evita que los elementos internos hereden el flex del padre */
     display: block; 
 }
+
+.user-dropdown .user-name {
+    height: 80px;
+    line-height: 80px;
+}
+
 .dropdown-menu {
     position: absolute; 
-    top: 86%; 
+    top: 80px; 
     right: 0;
-    background-color: #444; 
-    min-width: 160px;
+    
+    /* 🎯 CLAVE 1: Fondo Oscuro para contraste sobre fondo de página blanco */
+    background-color: #333; 
+    
+    /* Borde sutil y profesional */
+    border: 1px solid #007bff; 
+    
+    min-width: 200px;
     z-index: 1000;
-    padding: 8px 0;
-    border-radius: 4px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 0; 
+    border-radius: 8px;
+    /* Sombra oscura para que destaque */
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.4);
     display: flex; 
     flex-direction: column; 
     list-style: none; 
     line-height: normal; 
+    overflow: hidden; 
 }
     .dropdown-menu li {
         line-height: 1.2; 
@@ -106,19 +164,70 @@
         /* Estilos para los enlaces y botones del dropdown */
         .dropdown-menu li a,
         .dropdown-menu li button {
-            margin:0px;
-            padding:0%;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
+            padding: 12px 18px;
+            height: auto; 
+            line-height: normal; 
             text-align: left;
-            white-space: nowrap;
-            width: 100%;
+            
+            /* 🎯 CLAVE 2: Texto blanco sobre fondo oscuro */
+            color: #eee; 
+            
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 1em;
+            background-color: transparent; /* Aseguramos que no haya fondo extra */
         }
         .dropdown-menu li button {
-            border-radius: 0; /* Asegura un borde cuadrado para los botones */
+            cursor: pointer;
         }
         .dropdown-menu li a:hover,
         .dropdown-menu li button:hover {
-            background-color: #555; 
+            /* 🎯 CLAVE 3: Hover en Azul Primario */
+            background-color: #007bff;
+            color: white; /* Letra blanca sobre hover azul */
+            font-weight: 600;
         }
+
+/* Separador en el dropdown para mejor legibilidad */
+.dropdown-menu li:not(:last-child) {
+    /* Separador muy sutil en gris más oscuro */
+    border-bottom: 1px solid #444; 
+}
+/* -------------------------------------------------------- */
+/* 🟢 RESPONSIVE (Móvil) */
+/* -------------------------------------------------------- */
+@media (max-width: 768px) {
+    .main-header {
+        height: 65px;
+        padding: 0 15px;
+    }
+    
+    .main-header nav .ul-nav li .a-nav,
+    .main-header nav .ul-nav li .user-name,
+    .main-header nav .ul-nav li .button-nav {
+        height: 65px;
+        line-height: 65px;
+        padding: 0 8px;
+        font-size: 0.95em;
+    }
+
+    .dropdown-menu {
+        top: 65px;
+        min-width: 160px;
+    }
+    
+    .main-header .logo-header .site-desc {
+        display: none; 
+    }
+    
+    .main-header nav .ul-nav li:first-child { 
+        display: none;
+    }
+
+    /* Ajuste para el logo en móvil */
+    .main-header .logo-header .logo {
+        height: 60px; 
+        padding: 4px 6px; /* Ajustamos el padding para móvil */
+        border-radius: 6px;
+    }
+}
