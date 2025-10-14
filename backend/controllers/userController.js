@@ -6,7 +6,9 @@ const asyncHandler = require('express-async-handler'); // Utilidad para manejar 
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-    const { username, name, email, password, role } = req.body;
+    // Eliminamos 'role' de la desestructuración para evitar que el usuario lo establezca, 
+    // y dejamos que el modelo lo asigne por defecto ('buyer').
+    const { username, name, email, password } = req.body; 
 
     // 1. Validar que todos los campos requeridos existen
     if (!username || !name || !email || !password) {
@@ -14,24 +16,40 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error('Please add all fields');
     }
 
-    // 2. Verificar si el usuario ya existe
-    const userExists = await User.findOne({ username });
-    if (userExists) {
+    // 2. Validar formato de Email (simple)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
         res.status(400);
-        throw new Error('User already exists');
+        throw new Error('Please use a valid email format');
     }
 
-    // 3. Crear el usuario con 'status' por defecto a 'true'
+    // 3. Validar longitud/complejidad de Contraseña (ejemplo)
+    if (password.length < 6) {
+        res.status(400);
+        throw new Error('Password must be at least 6 characters long');
+    }
+
+    // 4. Verificar si el usuario ya existe (por username o email)
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
+    if (userExists) {
+        res.status(400);
+        throw new Error('User with this username or email already exists');
+    }
+
+    // 5. Crear el usuario con 'status' por defecto a 'pending' (como ya está en el modelo y controlador)
+    // El rol por defecto ('buyer') se asigna en el modelo, lo que mejora la seguridad.
     const user = await User.create({
         username,
         name,
         email,
         password,
-        role: role || 'buyer', // Asigna el rol si se envía, de lo contrario, por defecto es 'buyer'
-        status: "pending", // Nuevo atributo: siempre true al registrar
+        // Eliminamos el rol explícito de req.body aquí para que SIEMPRE sea el default del modelo ('buyer')
+        // o si queremos permitir roles a admins, deberíamos hacerlo en una ruta protegida. 
+        // En esta ruta pública, el rol debe ser fijo (buyer).
+        // role: role || 'buyer', // ANTERIOR: Permite al cliente elegir rol
     });
 
-    // 4. Enviar una respuesta con el token JWT
+    // 6. Enviar una respuesta con el token JWT
     if (user) {
         res.status(201).json({
             _id: user.id,
@@ -40,7 +58,7 @@ const registerUser = asyncHandler(async (req, res) => {
             email: user.email,
             role: user.role,
             status: user.status,
-            token: user.generateAuthToken(), // Genera y devuelve el token
+            token: user.generateAuthToken(), 
         });
     } else {
         res.status(400);
@@ -54,24 +72,47 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
 
-    // 1. Verificar si el usuario existe por su username
+    // 1. Validar campos de entrada
+    if (!username || !password) {
+        res.status(400);
+        throw new Error('Please provide both username and password');
+    }
+
+    // 2. Verificar si el usuario existe por su username
     const user = await User.findOne({ username });
 
-    // 2. Si el usuario existe, la contraseña es correcta Y el status es 'true', devolver el token
-    if (user && user.status && (await user.matchPassword(password))) {
-        res.json({
-            _id: user._id,
-            username: user.username,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            status: user.status,
-            token: user.generateAuthToken(), // Genera y devuelve el token
-        });
+    // 3. Verificar credenciales, estado y contraseña.
+    if (user && (await user.matchPassword(password))) {
+        // Validar el estado del usuario: solo 'active' puede iniciar sesión
+        if (user.status === 'active') {
+             res.json({
+                _id: user._id,
+                username: user.username,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                status: user.status,
+                token: user.generateAuthToken(), 
+            });
+        } else if (user.status === 'pending') {
+            res.status(401); 
+            throw new Error('Account is pending activation. Please check your email.'); // Mensaje para usuario pendiente
+        } else if (user.status === 'suspended') {
+            res.status(401); 
+            throw new Error('Account is suspended. Please contact support.'); // Mensaje para usuario suspendido
+        } else if (user.status === 'deleted') {
+            res.status(401); 
+            throw new Error('Account not found or is deactivated.'); // Mensaje para usuario eliminado
+        } else {
+            // Manejo de estado inesperado
+            res.status(401); 
+            throw new Error('Invalid credentials or account status issue.');
+        }
+
     } else {
-        res.status(401); // 401 Unauthorized
-        // Mensaje de error más específico para el usuario
-        throw new Error('Invalid credentials or account is deactivated');
+        res.status(401); 
+        // Mensaje de error general para evitar enumeración de usuarios
+        throw new Error('Invalid username or password'); 
     }
 });
 

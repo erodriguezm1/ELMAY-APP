@@ -252,7 +252,7 @@ function Home() {
             
             {/* 🟢 CONTENIDO PRINCIPAL SCROLLABLE (Centrado por CSS) */}
             <div className="main-content-scrollable">
-                <h1 className="main-title">treaming y gadgets electrónicos para todos.</h1>
+                <h1 className="main-title">Streaming y gadgets electrónicos.</h1>
                 
                 <section className="general-products-section">
                     <h2 className="section-title">
