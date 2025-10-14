@@ -43,6 +43,10 @@ const protect = asyncHandler(async (req, res, next) => {
 // Middleware para autorizar roles específicos
 const authorize = (...roles) => {
     return (req, res, next) => {
+        // 🚨 NUEVA REGLA: Si el usuario es 'admin', permitir el acceso a CUALQUIER ruta protegida por authorize.
+        if (req.user && req.user.role === 'admin') {
+            return next();
+        }
         // Verificamos si el rol del usuario está incluido en la lista de roles permitidos
         if (!roles.includes(req.user.role)) {
             res.status(403); // 403 Forbidden

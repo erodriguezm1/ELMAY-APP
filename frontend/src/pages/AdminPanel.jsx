@@ -1,4 +1,4 @@
-// ELMAY-APP/frontend/src/pages/AdminPanel.jsx
+// ELMAY-APP/frontend/src/pages/AdminPanel.jsx (MODIFICADO)
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
@@ -10,18 +10,49 @@ function AdminPanel() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    try {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        setUser(JSON.parse(userData));
-      } else {
-        // Redirigir al login si no hay datos de usuario
-        navigate('/login');
-      }
-    } catch (error) {
-      console.error('Error al parsear los datos del usuario:', error);
-      navigate('/login');
-    }
+    const checkAccessAndLoadUser = async () => {
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+            return navigate('/login');
+        }
+
+        const parsedUser = JSON.parse(userData);
+
+        // 1. Verificar acceso con una llamada a la API protegida
+        try {
+            const token = parsedUser.token; 
+            
+            // Intentar acceder a la ruta del panel de administrador
+            const response = await fetch('/api/users/admin', { 
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                // Acceso concedido por el backend (rol 'admin')
+                setUser(parsedUser);
+            } else if (response.status === 403) {
+                // Acceso denegado (rol incorrecto, no admin)
+                navigate('/'); // Redirigir a la página principal
+            } else if (response.status === 401) {
+                // Token inválido o expirado
+                localStorage.removeItem('user');
+                navigate('/login');
+            } else {
+                // Otro error
+                throw new Error('Error al verificar el acceso al panel de admin');
+            }
+            
+        } catch (error) {
+            console.error('Error de acceso al panel de administrador:', error);
+            navigate('/');
+        }
+    };
+
+    checkAccessAndLoadUser();
   }, [navigate]);
 
   const onLogout = () => {

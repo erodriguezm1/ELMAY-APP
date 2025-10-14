@@ -1,3 +1,4 @@
+// ELMAY-APP/frontend/src/pages/SellerPanel.jsx (MODIFICADO)
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header.jsx';
@@ -12,21 +13,49 @@ function SellerPanel() {
     const [refreshList, setRefreshList] = useState(false); // Estado para forzar la recarga
 
     useEffect(() => {
-        try {
+        const checkAccessAndLoadUser = async () => {
             const userData = localStorage.getItem('user');
-            if (userData) {
-                const parsedUser = JSON.parse(userData);
-                if (parsedUser.role !== 'seller' && parsedUser.role !== 'admin') {
-                    navigate('/');
-                }
-                setUser(parsedUser);
-            } else {
-                navigate('/login');
+            if (!userData) {
+                return navigate('/login');
             }
-        } catch (error) {
-            console.error('Error al parsear los datos del usuario:', error);
-            navigate('/login');
-        }
+
+            const parsedUser = JSON.parse(userData);
+
+            // 1. Verificar acceso haciendo una llamada a la API protegida
+            try {
+                const token = parsedUser.token; 
+                
+                // Intentar acceder a la ruta del dashboard de vendedor
+                const response = await fetch('/api/users/dashboard', { 
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    // Acceso concedido por el backend (rol 'seller' o 'admin')
+                    setUser(parsedUser);
+                } else if (response.status === 403) {
+                    // Acceso denegado (rol incorrecto o no admin)
+                    navigate('/'); // Redirigir a la página principal
+                } else if (response.status === 401) {
+                    // Token inválido o expirado
+                    localStorage.removeItem('user');
+                    navigate('/login');
+                } else {
+                    // Otro error
+                    throw new Error('Error al verificar el acceso al panel');
+                }
+                
+            } catch (error) {
+                console.error('Error de acceso al panel de vendedor:', error);
+                navigate('/');
+            }
+        };
+
+        checkAccessAndLoadUser();
     }, [navigate]);
 
     // Esta función se llama desde el modal cuando un producto se crea con éxito
@@ -35,14 +64,14 @@ function SellerPanel() {
         setRefreshList(prev => !prev); // Alterna el estado para forzar la recarga de ProductList
     };
   
-    // Función para forzar la recarga de la lista después de una actualización de status/oferta
+    // Función para recargar la lista de productos tras una actualización (status/oferta)
     const handleProductUpdated = () => {
         setRefreshList(prev => !prev);
     };
 
     if (!user) {
         return <div>Cargando...</div>;
-      }
+    }
   
     const isAdmin = user.role === 'admin';
 
@@ -65,11 +94,6 @@ function SellerPanel() {
                     onProductCreated={handleProductCreated}
                 />
 
-                {/*
-                  Se añade `isAdmin` y `onProductUpdated` para que ProductList pueda:
-                  1. Mostrar las herramientas de administración condicionalmente.
-                  2. Recargar la lista tras una actualización de estado (status/oferta).
-                */}
                 <ProductList 
                     key={refreshList} 
                     isAdmin={isAdmin} 
