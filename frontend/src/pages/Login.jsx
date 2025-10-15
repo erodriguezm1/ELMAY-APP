@@ -129,7 +129,7 @@ function Login() {
       const { token, name, role } = response.data; 
 
       // 3. Guardar datos en el almacenamiento local
-      localStorage.setItem('user', JSON.stringify({ name, role }));
+      localStorage.setItem('user', JSON.stringify({ name, role, token }));
       // localStorage.setItem('token', token); 
       
       // 4. Disparar evento para actualizar el Header
