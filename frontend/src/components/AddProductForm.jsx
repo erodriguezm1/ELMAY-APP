@@ -1,11 +1,29 @@
 import React, { useState } from 'react';
-import './AddProductForm.css'; // Solución: El CSS ahora existe
-import axios from 'axios'; // Usaremos axios por su simplicidad
+import './AddProductForm.css'; 
+import axios from 'axios'; 
+
+// =================================================================
+// 🟢 FUNCIÓN DE UTILIDAD CONSISTENTE PARA OBTENER DATOS DE USUARIO
+// =================================================================
+const getUserData = () => {
+    try {
+        const userData = localStorage.getItem('user');
+        // Si userData existe, parseamos y devolvemos el objeto completo
+        return userData ? JSON.parse(userData) : null;
+    } catch (e) {
+        console.error("Error al parsear el usuario de localStorage:", e);
+        // Opcional: Limpiar el almacenamiento local si el objeto está corrupto
+        localStorage.removeItem('user'); 
+        return null;
+    }
+};
+// =================================================================
+
 
 // Definición de las categorías principales y sus subcategorías
 const MAIN_CATEGORIES = ['Electrónica', 'Hogar', 'Streaming', 'Alimentos', 'Herramientas'];
 
-// Mapeo de subcategorías basado en el ejemplo que proporcionaste
+// Mapeo de subcategorías
 const SUBCATEGORIES_MAP = {
   'Electrónica': ['Mouse', 'RAM', 'Disco Duro', 'Teclado', 'Smartphones', 'Televisores', 'Audio'],
   'Hogar': ['Muebles', 'Decoración', 'Cocina', 'Limpieza'],
@@ -27,108 +45,116 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
   });
   const [message, setMessage] = useState('');
 
-  // Si el modal no está abierto, no renderizamos nada
+  // Si el modal no está abierto, no renderizamos nada para optimizar
   if (!isOpen) {
     return null;
   }
 
-  // Maneja los cambios en los campos del formulario
+  // Lógica para determinar subcategorías disponibles
+  const availableSubcategories = SUBCATEGORIES_MAP[productData.category] || [];
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Si la categoría cambia, reseteamos la subcategoría
+    // Si se cambia la categoría principal, limpiamos la subcategoría
     if (name === 'category') {
-        setProductData({
-            ...productData,
-            [name]: value,
-            subcategory: '', // Importante: Resetear subcategoría al cambiar la principal
-        });
+      setProductData(prev => ({
+        ...prev,
+        category: value,
+        subcategory: '' // Resetear subcategoría
+      }));
     } else {
-        setProductData({
-            ...productData,
-            [name]: value,
-        });
+      setProductData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
 
-  // Maneja el envío del formulario a la API del backend
+  // 🟢 FUNCIÓN DE SUBMISIÓN CORREGIDA
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
-    
-    const token = localStorage.getItem('authToken');
+
+    // 🟢 1. OBTENER TOKEN DE FORMA CONSISTENTE
+    const userData = getUserData();
+    const token = userData?.token;
 
     if (!token) {
-      setMessage('Error: No se encontró el token de autenticación. Por favor, inicia sesión.');
+        // 🔴 Manejar el error si no hay token (usuario no autenticado)
+        setMessage('Error: No autorizado. Por favor, inicia sesión para añadir productos.');
+        setLoading(false);
+        onClose(); // Cerrar el formulario si no hay token
+        return;
+    }
+
+    // Validación básica de campos obligatorios
+    if (!productData.name || !productData.category || !productData.description || !productData.price || !productData.imageUrl || !productData.stock) {
+      setMessage('Error: Todos los campos son obligatorios.');
       setLoading(false);
       return;
     }
 
-    // Asegurarse de que el precio y el stock sean números (ya que se envían como strings del input)
-    const payload = {
-        ...productData,
-        price: parseFloat(productData.price),
-        stock: parseInt(productData.stock, 10)
-    };
-    
-    // Si la categoría seleccionada no tiene subcategorías, aseguramos que el campo subcategory no se envíe vacío si es innecesario.
-    const hasSubcategories = SUBCATEGORIES_MAP[productData.category] && SUBCATEGORIES_MAP[productData.category].length > 0;
-    
-    if (!hasSubcategories) {
-        // Enviar solo la categoría principal si no hay subcategorías
-        delete payload.subcategory;
+    // Validación de subcategoría
+    if (availableSubcategories.length > 0 && !productData.subcategory) {
+        setMessage('Error: Selecciona una subcategoría para la categoría elegida.');
+        setLoading(false);
+        return;
     }
-
-
+    
     try {
-      const response = await axios.post('/api/products', payload, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        },
-      });
+        // 🟢 2. INCLUIR EL TOKEN EN LOS HEADERS DE LA CONFIGURACIÓN
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`, // ¡Añadido el token!
+            },
+        };
+        
+        // Llamada a la API de creación de producto (asumiendo que es /api/products)
+        const response = await axios.post('/api/products', productData, config);
 
-      if (response.status === 201) {
-        setMessage('Producto agregado con éxito.');
+        setMessage(`Producto "${response.data.name}" agregado con éxito!`);
+        
+        // Limpiar el formulario
         setProductData({
-          name: '',
-          category: '',
-          subcategory: '', // Resetear subcategoría
-          description: '',
-          price: '',
-          imageUrl: '',
-          stock: '',
+            name: '', category: '', subcategory: '', description: '',
+            price: '', imageUrl: '', stock: ''
         });
-        // Llama a la función del padre para cerrar el modal y recargar la lista
+        
+        // Llamar a la función del padre para notificar la creación y actualizar la lista
         if (onProductCreated) {
-          onProductCreated();
+            onProductCreated(response.data);
         }
-      }
+
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Error desconocido al agregar el producto.';
-      setMessage(`Error: ${errorMessage}`);
+        // Manejo de error 401/403 (No autorizado/Acceso denegado)
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            setMessage('Error: No tienes permiso o la sesión expiró. Vuelve a iniciar sesión.');
+            localStorage.removeItem('user'); // Limpiar token
+        } else {
+            setMessage(`Error al agregar el producto: ${error.response?.data?.message || error.message}`);
+        }
     } finally {
       setLoading(false);
     }
   };
 
-  // Obtiene las subcategorías disponibles para la categoría seleccionada
-  const availableSubcategories = SUBCATEGORIES_MAP[productData.category] || [];
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-button" onClick={onClose}>
-          &times;
-        </button>
+    <div className="modal-overlay">
+      <div className="modal-content">
         <div className="add-product-form">
-          <h2>Agregar Nuevo Producto</h2>
+          <div className="form-header">
+            <h2>Añadir Nuevo Producto</h2>
+            <button className="close-button" onClick={onClose}>&times;</button>
+          </div>
+          
           <form onSubmit={handleSubmit}>
-            
             {/* CAMPO: NOMBRE */}
             <div className="form-group">
-              <label htmlFor="name">Nombre</label>
+              <label htmlFor="name">Nombre del Producto</label>
               <input
                 type="text"
                 id="name"
@@ -138,26 +164,26 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
                 required
               />
             </div>
-            
-            {/* CAMPO: CATEGORÍA PRINCIPAL (SELECT) */}
+
+            {/* CAMPO: CATEGORÍA PRINCIPAL */}
             <div className="form-group">
-              <label htmlFor="category">Categoría Principal</label>
-              <select
-                id="category"
-                name="category"
-                value={productData.category}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="" disabled>Selecciona una categoría</option>
-                {MAIN_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
+                <label htmlFor="category">Categoría Principal</label>
+                <select
+                    id="category"
+                    name="category"
+                    value={productData.category}
+                    onChange={handleInputChange}
+                    required
+                >
+                    <option value="">Selecciona una Categoría</option>
+                    {MAIN_CATEGORIES.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                </select>
             </div>
 
-            {/* CAMPO: SUBCATEGORÍA (SELECT CONDICIONAL) */}
-            {productData.category && availableSubcategories.length > 0 && (
+            {/* CAMPO: SUBCATEGORÍA (CONDICIONAL) */}
+            {availableSubcategories.length > 0 && (
                 <div className="form-group">
                     <label htmlFor="subcategory">Subcategoría</label>
                     <select
@@ -167,14 +193,14 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
                         onChange={handleInputChange}
                         required
                     >
-                        <option value="" disabled>Selecciona una subcategoría</option>
-                        {availableSubcategories.map((subcat) => (
-                            <option key={subcat} value={subcat}>{subcat}</option>
+                        <option value="">Selecciona una Subcategoría</option>
+                        {availableSubcategories.map(sub => (
+                            <option key={sub} value={sub}>{sub}</option>
                         ))}
                     </select>
                 </div>
             )}
-
+            
             {/* CAMPO: DESCRIPCIÓN */}
             <div className="form-group">
               <label htmlFor="description">Descripción</label>
@@ -183,14 +209,13 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
                 name="description"
                 value={productData.description}
                 onChange={handleInputChange}
-                rows="3"
                 required
-              ></textarea>
+              />
             </div>
             
             {/* CAMPO: PRECIO */}
             <div className="form-group">
-              <label htmlFor="price">Precio ($)</label>
+              <label htmlFor="price">Precio</label>
               <input
                 type="number"
                 id="price"
@@ -198,12 +223,12 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
                 value={productData.price}
                 onChange={handleInputChange}
                 required
-                min="0"
+                min="0.01"
                 step="0.01"
               />
             </div>
             
-            {/* CAMPO: URL IMAGEN */}
+            {/* CAMPO: URL DE IMAGEN */}
             <div className="form-group">
               <label htmlFor="imageUrl">URL de la Imagen</label>
               <input
@@ -233,7 +258,6 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
             <button
               type="submit"
               className="submit-button"
-              // Deshabilitar si se requiere subcategoría y no ha sido seleccionada
               disabled={loading || (availableSubcategories.length > 0 && !productData.subcategory)} 
             >
               {loading ? 'Agregando...' : 'Agregar Producto'}

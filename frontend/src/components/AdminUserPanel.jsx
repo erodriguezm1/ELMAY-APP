@@ -1,7 +1,23 @@
-import React, { useState, useEffect, useCallback } from 'react'; // Importado useCallback
+// ELMAY-APP/frontend/src/components/AdminUserPanel.jsx
+
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './AdminUserPanel.css';
 import { useNavigate } from "react-router-dom";
+
+// =================================================================
+// 🟢 FUNCIÓN DE UTILIDAD CONSISTENTE PARA OBTENER DATOS DE USUARIO
+// =================================================================
+const getUserData = () => {
+    try {
+        const userData = localStorage.getItem('user'); // 🟢 ¡Clave corregida!
+        return userData ? JSON.parse(userData) : null;
+    } catch (e) {
+        console.error("Error al parsear el usuario de localStorage:", e);
+        return null;
+    }
+};
+// =================================================================
 
 const AdminUserPanel = () => {
     const [users, setUsers] = useState([]);
@@ -10,174 +26,222 @@ const AdminUserPanel = () => {
     const navigate = useNavigate();
     const [modalState, setModalState] = useState({ isOpen: false, message: '', action: null, params: null });
     const [messageModalState, setMessageModalState] = useState({ isOpen: false, message: '' });
-
-    // URL base de la API
-    // Si tienes problemas de proxy (como recibir HTML), intenta cambiar esto a '/api/users' 
-    // y configura tu servidor de desarrollo para redirigir esa ruta.
+    
     const API_URL = '/api/users';
 
-    // Obtener el token directamente de localStorage
-    const adminToken = localStorage.getItem('authToken');
-
+    // 🟢 Obtener el token y los datos del usuario de forma consistente
+    const userData = getUserData();
+    const adminToken = userData?.token;
+    
     // Función para limpiar token y redirigir (memorizada)
     const handleAuthError = useCallback(() => {
-        localStorage.removeItem("authToken");
+        localStorage.removeItem("user"); // 🟢 ¡Clave corregida!
         navigate("/login");
     }, [navigate]);
 
     // Función para obtener todos los usuarios de la API (usando axios y memorizada)
     const fetchUsers = useCallback(async () => {
         if (!adminToken) {
-            setError("No autorizado. Por favor, inicia sesión con una cuenta de administrador.");
+            // Esto es lo que causaba el error de "No autorizado" previamente
+            setError("No autorizado. Por favor, inicia sesión con una cuenta de administrador."); 
             setLoading(false);
             return;
         }
 
         try {
-            setLoading(true);
             const config = {
                 headers: {
-                    Authorization: `Bearer ${adminToken}`,
+                    'Authorization': `Bearer ${adminToken}`,
                 },
             };
-            const response = await axios.get(API_URL, config);
-            setUsers(response.data);
+            
+            // Llama a la ruta GET /api/users, que debe estar protegida por el rol 'admin'
+            const response = await axios.get(API_URL, config); 
+            
+            // Filtramos al usuario actual para que no pueda modificarse a sí mismo (opcional)
+            // Asumiendo que el objeto userData tiene un _id
+            const filteredUsers = response.data.filter(user => user._id !== userData._id); 
+            setUsers(filteredUsers);
             setError(null);
+
         } catch (err) {
-            // Manejo mejorado de errores con axios
-            if (err.response && err.response.status === 401) {
+            // Manejar 401 (token fallido/expirado) o 403 (rol incorrecto)
+            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
                 handleAuthError();
-            } else if (err.response) {
-                // Captura mensajes de error del backend si están disponibles
-                setError(err.response.data.message || `Error ${err.response.status}: Error al cargar los usuarios.`);
             } else {
-                // Error de red (servidor caído, CORS, o Proxy mal configurado)
-                setError('Error de red al cargar los usuarios. Revisa la conexión o el backend.');
+                setError(err.response?.data?.message || "Error al cargar la lista de usuarios.");
             }
-            console.error("Error en fetchUsers:", err);
         } finally {
             setLoading(false);
         }
-    }, [adminToken, handleAuthError]); // Dependencias de useCallback
+    }, [adminToken, handleAuthError, userData]); 
 
+    // Cargar usuarios al montar el componente o cuando se requiera refrescar
     useEffect(() => {
-        // Llama a la versión memoizada de fetchUsers
-        fetchUsers();
-    }, [fetchUsers]); // Dependencia del efecto: la función memoizada
+        if (adminToken) {
+            fetchUsers();
+        } else {
+            setLoading(false); 
+        }
+    }, [fetchUsers, adminToken]);
+    
+    // ... (El resto de la lógica de handleUpdateRole, handleDeleteUser y Modales permanece igual)
+    // El resto del componente...
 
-    // Handlers para las acciones que activan el modal de confirmación
-    const handleUpdateRole = (userId, newRole) => {
+    // ==================================================
+    // ⬇️ LÓGICA DE MODIFICACIÓN DE ROL ⬇️
+    // ==================================================
+    const handleUpdateRole = async (userId, newRole) => {
+        // 1. Mostrar modal de confirmación
         setModalState({
             isOpen: true,
-            message: `¿Estás seguro de que deseas cambiar el rol de este usuario a ${newRole}?`,
-            action: 'updateRole',
+            message: `¿Estás seguro de cambiar el rol del usuario ${userId.slice(-4)} a "${newRole}"?`,
+            action: async () => {
+                // 2. Ejecutar la actualización después de la confirmación
+                setLoading(true);
+                setModalState({ isOpen: false, message: '', action: null, params: null });
+
+                try {
+                    const config = {
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                        },
+                    };
+                    
+                    await axios.put(`${API_URL}/${userId}`, { role: newRole }, config);
+
+                    // 3. Actualizar el estado localmente
+                    setUsers(users.map(user => 
+                        user._id === userId ? { ...user, role: newRole } : user
+                    ));
+                    setMessageModalState({ isOpen: true, message: `Rol de usuario ${userId.slice(-4)} actualizado a "${newRole}" con éxito.` });
+
+                } catch (err) {
+                    if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+                        handleAuthError();
+                    } else {
+                        setMessageModalState({ isOpen: true, message: `Error al actualizar el rol: ${err.response?.data?.message || err.message}` });
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            },
             params: { userId, newRole }
         });
     };
 
-    const handleDeleteUser = (userId) => {
+    // ==================================================
+    // ⬇️ LÓGICA DE ELIMINACIÓN DE USUARIO ⬇️
+    // ==================================================
+    const handleDeleteUser = async (userId) => {
+        // 1. Mostrar modal de confirmación
         setModalState({
             isOpen: true,
-            message: '¿Estás seguro de que deseas eliminar a este usuario?',
-            action: 'deleteUser',
+            message: `⚠️ ¿Estás seguro de ELIMINAR al usuario ${userId.slice(-4)}? Esta acción es irreversible.`,
+            action: async () => {
+                // 2. Ejecutar la eliminación después de la confirmación
+                setLoading(true);
+                setModalState({ isOpen: false, message: '', action: null, params: null });
+
+                try {
+                    const config = {
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                        },
+                    };
+                    
+                    await axios.delete(`${API_URL}/${userId}`, config);
+
+                    // 3. Actualizar el estado localmente
+                    setUsers(users.filter(user => user._id !== userId));
+                    setMessageModalState({ isOpen: true, message: `Usuario ${userId.slice(-4)} eliminado con éxito.` });
+
+                } catch (err) {
+                    if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+                        handleAuthError();
+                    } else {
+                        setMessageModalState({ isOpen: true, message: `Error al eliminar el usuario: ${err.response?.data?.message || err.message}` });
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            },
             params: { userId }
         });
     };
-
-    // Función para ejecutar la acción confirmada
-    const handleModalConfirm = async () => {
-        const { action, params } = modalState;
-        setModalState({ ...modalState, isOpen: false });
-
-        try {
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${adminToken}`,
-                },
-            };
-
-            if (action === 'updateRole') {
-                const { userId, newRole } = params;
-                // NOTA: Asegúrate de que API_URL no tenga la barra final, ya que se agrega aquí con ${userId}
-                await axios.put(`${API_URL.replace(/\/users$/, '')}/${userId}`, { role: newRole }, config); 
-                setMessageModalState({ isOpen: true, message: 'Rol de usuario actualizado exitosamente.' });
-            } else if (action === 'deleteUser') {
-                const { userId } = params;
-                await axios.delete(`${API_URL.replace(/\/users$/, '')}/${userId}`, config);
-                setMessageModalState({ isOpen: true, message: 'Usuario eliminado exitosamente.' });
-            }
-            fetchUsers(); // Recarga la lista de usuarios después de la acción
-        } catch (err) {
-             // Manejo de error específico para acciones PUT/DELETE
-             if (err.response && err.response.status === 401) {
-                handleAuthError();
-            } else if (err.response) {
-                setError(err.response.data.message || `Error ${err.response.status}: Error al realizar la acción.`);
-            } else {
-                setError('Error de red al realizar la acción. Por favor, revisa la consola.');
-            }
-            console.error("Error en handleModalConfirm:", err.response ? err.response.data : err);
-        }
+    
+    // ==================================================
+    // ⬇️ RENDERING DE MODALES ⬇️
+    // ==================================================
+    const ConfirmationModal = ({ isOpen, message, onConfirm, onClose }) => {
+        if (!isOpen) return null;
+        return (
+            <div className="modal-overlay">
+                <div className="modal-content">
+                    <p>{message}</p>
+                    <div className="modal-actions">
+                        <button onClick={onConfirm} className="confirm-button">Confirmar</button>
+                        <button onClick={onClose} className="cancel-button">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
+    const MessageModal = ({ isOpen, message, onClose }) => {
+        if (!isOpen) return null;
+        return (
+            <div className="modal-overlay">
+                <div className="modal-content">
+                    <p>{message}</p>
+                    <button onClick={onClose} className="confirm-button">Aceptar</button>
+                </div>
+            </div>
+        );
+    };
+
+    // ==================================================
+    // ⬇️ RENDERING PRINCIPAL ⬇️
+    // ==================================================
     return (
         <>
-            {/* Confirmation Modal */}
-            {modalState.isOpen && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <p className="modal-message">{modalState.message}</p>
-                        <div className="modal-buttons">
-                            <button className="confirm-btn" onClick={handleModalConfirm}>Sí</button>
-                            <button className="cancel-btn" onClick={() => setModalState({ ...modalState, isOpen: false })}>No</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmationModal
+                isOpen={modalState.isOpen}
+                message={modalState.message}
+                onConfirm={modalState.action}
+                onClose={() => setModalState({ isOpen: false, message: '', action: null, params: null })}
+            />
+            <MessageModal
+                isOpen={messageModalState.isOpen}
+                message={messageModalState.message}
+                onClose={() => setMessageModalState({ isOpen: false, message: '' })}
+            />
 
-            {/* Message Modal */}
-            {messageModalState.isOpen && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <p className="modal-message">{messageModalState.message}</p>
-                        <div className="modal-buttons">
-                            <button className="confirm-btn" onClick={() => setMessageModalState({ ...messageModalState, isOpen: false })}>Ok</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <div className="admin-user-panel p-6 bg-white rounded-lg shadow-xl">
+                <h3 className="text-2xl font-semibold mb-6 text-gray-800">Gestión de Usuarios</h3>
 
-            <div className="container">
-                <h1 className="title">Panel de Administración de Usuarios</h1>
-                <p className="subtitle">Gestiona los perfiles y roles de los usuarios registrados.</p>
-
-                {loading && (
-                    <div className="loading-spinner">
-                        <div className="spinner"></div>
-                    </div>
-                )}
-                {error && <div className="error-message">{error}</div>}
+                {loading && <div className="text-center py-4">Cargando usuarios...</div>}
+                {error && <div className="text-red-500 bg-red-100 p-3 rounded mb-4">{error}</div>}
 
                 {!loading && !error && (
-                    <div className="panel">
-                        <div className="overflow-x-auto">
+                    <div className="overflow-x-auto">
+                        <div className="min-w-full">
                             <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="table-header">
+                                <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="table-header th">ID de Usuario</th>
-                                        <th className="table-header th">Nombre</th>
-                                        <th className="table-header th">Correo Electrónico</th>
-                                        <th className="table-header th">Rol</th>
-                                        <th className="table-header th">Estado</th>
-                                        <th className="table-header th">Acciones</th>
+                                        <th className="table-header">ID (últimos 4 dígitos)</th>
+                                        <th className="table-header">Nombre</th>
+                                        <th className="table-header">Email</th>
+                                        <th className="table-header">Rol</th>
+                                        <th className="table-header">Estado</th>
+                                        <th className="table-header">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {users.map((user) => (
-                                        <tr key={user._id} className="table-row">
-                                            <td className="table-cell font-mono text-gray-500">{user._id}</td>
-                                            <td className="table-cell font-medium text-gray-900">{user.name}</td>
+                                        <tr key={user._id} className="hover:bg-gray-50">
+                                            <td className="table-cell font-mono text-xs">{user._id.slice(-4)}</td>
+                                            <td className="table-cell font-medium">{user.name}</td>
                                             <td className="table-cell text-gray-500">{user.email}</td>
                                             <td className="table-cell">
                                                 <select
@@ -185,7 +249,7 @@ const AdminUserPanel = () => {
                                                     onChange={(e) => handleUpdateRole(user._id, e.target.value)}
                                                     className="select-role"
                                                 >
-                                                    <option value="user">Usuario</option>
+                                                    <option value="buyer">Comprador</option>
                                                     <option value="seller">Vendedor</option>
                                                     <option value="admin">Administrador</option>
                                                 </select>

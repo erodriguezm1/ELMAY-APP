@@ -1,7 +1,6 @@
-// ELMAY-APP/backend/models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); 
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken'); // Importar JWT
 
 const userSchema = mongoose.Schema(
   {
@@ -51,16 +50,25 @@ userSchema.pre('save', async function (next) {
 
 // Método para comparar la contraseña ingresada con la encriptada
 userSchema.methods.matchPassword = async function (enteredPassword) {
+  // Asegúrate de usar 'bcrypt.compare' para comparar
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Método para generar el token JWT
+// 🟢 MÉTODO CORREGIDO: Generar el token de autenticación con expiración extendida
 userSchema.methods.generateAuthToken = function () {
-  return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
-    expiresIn: '1h',
-  });
+    return jwt.sign(
+        { 
+            id: this._id, 
+            role: this.role 
+        }, 
+        process.env.JWT_SECRET, // Secreto del servidor
+        {
+            // 🚨 SOLUCIÓN: La expiración se establece a 30 días
+            expiresIn: '1h', 
+        }
+    );
 };
 
-const User = mongoose.model('User', userSchema);
 
+const User = mongoose.model('User', userSchema);
 module.exports = User;

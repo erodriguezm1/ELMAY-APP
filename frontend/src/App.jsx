@@ -28,37 +28,44 @@ function App() {
     image: "https://placehold.co/400x160/FEE2E2/DC2626?text=OFERTA+33%25+OFF"
   };
 
+  // 🟢 CORRECCIÓN: Función simplificada. La validación de expiración la hace el backend.
   const isTokenValid = (token) => {
+    // Basta con verificar que el string del token exista. 
+    // Los componentes protegidos (AdminPanel, SellerPanel) 
+    // se encargarán de la validación de expiración llamando al backend.
     return !!token;
   };
 
 
   useEffect(() => {
-    try {
-      const userData = localStorage.getItem('user');
-      const authToken = localStorage.getItem('authToken');
-      if (userData && isTokenValid(authToken)) {
-        setUser(JSON.parse(userData));
-      } else {
-        // Si el token es inválido o no existe, cierra la sesión.
-        onLogout();
-      }
-      // Lógica para mostrar la Mega Oferta solo una vez por sesión de navegador
-      const hasSeenOffer = localStorage.getItem('hasSeenMegaOffer');
-      if (!hasSeenOffer) {
-        setShowMegaOffer(true);
-        // Marcamos que ya la vio para no mostrarla en recargas o navegaciones futuras
-        localStorage.setItem('hasSeenMegaOffer', 'true');
-      }
-    } catch (error) {
-      console.error("Error al parsear los datos del usuario en App.jsx:", error);
-      setUser(null);
+    // 🟢 CORRECCIÓN: Sólo verificamos la clave 'user'
+    const userData = localStorage.getItem('user');
+    
+    if (userData) {
+        try {
+            const parsedUser = JSON.parse(userData);
+            
+            // Verificar si el token existe dentro del objeto 'user'
+            if (parsedUser.token && isTokenValid(parsedUser.token)) {
+                // El usuario existe en localStorage y tiene un token. Establecer la sesión.
+                setUser(parsedUser);
+            } else {
+                // El token no es válido o falta. Limpiar.
+                localStorage.removeItem('user');
+                setUser(null);
+            }
+        } catch (e) {
+            // Error al parsear JSON, limpiar sesión.
+            console.error("Error al cargar la sesión desde localStorage:", e);
+            localStorage.removeItem('user');
+            setUser(null);
+        }
     }
-  }, []);
+  }, []); // Se ejecuta solo al montar el componente
 
   const onLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    localStorage.removeItem('user'); // 🟢 CORRECCIÓN: Sólo elimina la clave única 'user'
+    // localStorage.removeItem('token'); // ❌ SE ELIMINÓ
     setUser(null);
   };
 
@@ -75,7 +82,8 @@ function App() {
         onClose={handleCloseMegaOffer} 
         offerDetails={megaOffer}
       />
-      <SessionTimeout />
+      {/* NOTA: SessionTimeout debe usar el mismo estado 'user' si lo necesita */}
+      <SessionTimeout user={user} onLogout={onLogout} /> 
       <div className="header-fixed-container"> 
         <Header user={user} onLogout={onLogout} />
       </div>
@@ -100,7 +108,6 @@ function App() {
             } 
           />
         </Routes>
-        <script src="//code.tidio.co/cnpkfi4vnh0h2cauzgtxggyvrucrbi0z.js" async></script>
       </main>
       <Footer />
     </Router>

@@ -8,15 +8,15 @@
  */
 export async function authenticatedFetch(endpoint, options = {}) {
     // 1. Obtener el token del almacenamiento local
-    const authToken = localStorage.getItem('authToken');
+    const userData = localStorage.getItem('user'); // 🟢 CORRECCIÓN: Usar la clave 'user'
+    const authToken = userData ? JSON.parse(userData).token : null; // 🟢 CORRECCIÓN: Extraer el token
 
     if (!authToken) {
-        // Si no hay token, lanza un error de inmediato (lo que causaría el 401 si se hiciera en la red)
+        // Si no hay token, lanza un error de inmediato
         throw new Error("No hay token de autenticación disponible. Sesión expirada o no iniciada.");
     }
 
     // 2. Definir la URL base de la API (ajustar si es necesario)
-    // Usamos el mismo patrón que se define en el entorno de Vite (VITE_APP_API_URL)
     const BASE_URL = import.meta.env.VITE_APP_API_URL || '/api';
     
     // 3. Configurar los encabezados (Headers)
@@ -37,11 +37,11 @@ export async function authenticatedFetch(endpoint, options = {}) {
     try {
         const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
-        if (response.status === 401) {
-            // Manejo específico del 401: forzar el cierre de sesión si el token es inválido/expirado
-            console.error("Token inválido o expirado. Forzando cierre de sesión.");
-            localStorage.removeItem('user');
-            localStorage.removeItem('authToken');
+        if (response.status === 401 || response.status === 403) {
+            // Manejo específico del 401/403: forzar el cierre de sesión si el token es inválido/expirado/no autorizado
+            console.error("Token inválido, expirado o rol no autorizado. Forzando cierre de sesión.");
+            localStorage.removeItem('user'); // 🟢 CORRECCIÓN: Sólo elimina la clave 'user'
+            // localStorage.removeItem('authToken'); // ❌ SE ELIMINÓ
             window.location.href = '/login'; // Redirigir
             return; // Detener la ejecución
         }
@@ -53,7 +53,7 @@ export async function authenticatedFetch(endpoint, options = {}) {
 
         return await response.json();
     } catch (error) {
-        console.error("Error en la función authenticatedFetch:", error);
-        throw error;
+        console.error('Error en authenticatedFetch:', error);
+        throw error; // Propagar el error para que el componente lo maneje
     }
 }
