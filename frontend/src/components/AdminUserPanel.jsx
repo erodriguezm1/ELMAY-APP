@@ -1,16 +1,17 @@
-// ELMAY-APP/frontend/src/components/AdminUserPanel.jsx
+// ELMAY-APP/frontend/src/components/AdminUserPanel.jsx (VERSIÓN FINAL CON NUEVOS STATUS)
 
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './AdminUserPanel.css';
 import { useNavigate } from "react-router-dom";
+import ReactDOM from 'react-dom';
 
 // =================================================================
 // 🟢 FUNCIÓN DE UTILIDAD CONSISTENTE PARA OBTENER DATOS DE USUARIO
 // =================================================================
 const getUserData = () => {
     try {
-        const userData = localStorage.getItem('user'); // 🟢 ¡Clave corregida!
+        const userData = localStorage.getItem('user'); 
         return userData ? JSON.parse(userData) : null;
     } catch (e) {
         console.error("Error al parsear el usuario de localStorage:", e);
@@ -18,6 +19,65 @@ const getUserData = () => {
     }
 };
 // =================================================================
+
+const ROLES = ['buyer', 'seller', 'admin'];
+
+// 🎯 LISTA DE ESTADOS DE USUARIO ACTUALIZADA
+const STATUSES = ['pending', 'active', 'suspended', 'deleted']; 
+
+// Función de utilidad para obtener la etiqueta y el icono del estado
+const getStatusLabel = (status) => {
+    switch (status) {
+        case 'active':
+            return '✅ Activo';
+        case 'pending':
+            return '⌛ Pendiente';
+        case 'suspended':
+            return '🚫 Suspendido';
+        case 'deleted':
+            return '🗑️ Eliminado';
+        default:
+            return 'Desconocido';
+    }
+}
+// =================================================================
+
+
+// 🟢 MODALES CON REACT PORTALS (Se mantienen igual para evitar el parpadeo)
+// ... (ConfirmationModal y MessageModal se mantienen igual) ...
+
+const ConfirmationModal = ({ isOpen, message, onConfirm, onCancel }) => {
+    if (!isOpen) return null;
+    return ReactDOM.createPortal(
+        <div className={`modal-overlay ${isOpen ? 'open' : ''}`}>
+            <div className="modal-content">
+                <p className="modal-message">{message}</p>
+                <div className="modal-buttons">
+                    <button onClick={onCancel} className="cancel-btn">Cancelar</button>
+                    <button onClick={onConfirm} className="confirm-btn">Confirmar</button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+};
+
+const MessageModal = ({ isOpen, message, onClose }) => {
+    if (!isOpen) return null;
+    return ReactDOM.createPortal(
+        <div className={`modal-overlay ${isOpen ? 'open' : ''}`}>
+            <div className="modal-content">
+                <p className="modal-message">{message}</p>
+                <div className="modal-buttons">
+                    <button onClick={onClose} className="confirm-btn">Cerrar</button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+};
+// =================================================================
+
 
 const AdminUserPanel = () => {
     const [users, setUsers] = useState([]);
@@ -29,20 +89,16 @@ const AdminUserPanel = () => {
     
     const API_URL = '/api/users';
 
-    // 🟢 Obtener el token y los datos del usuario de forma consistente
     const userData = getUserData();
     const adminToken = userData?.token;
     
-    // Función para limpiar token y redirigir (memorizada)
     const handleAuthError = useCallback(() => {
-        localStorage.removeItem("user"); // 🟢 ¡Clave corregida!
+        localStorage.removeItem("user");
         navigate("/login");
     }, [navigate]);
 
-    // Función para obtener todos los usuarios de la API (usando axios y memorizada)
     const fetchUsers = useCallback(async () => {
         if (!adminToken) {
-            // Esto es lo que causaba el error de "No autorizado" previamente
             setError("No autorizado. Por favor, inicia sesión con una cuenta de administrador."); 
             setLoading(false);
             return;
@@ -55,17 +111,13 @@ const AdminUserPanel = () => {
                 },
             };
             
-            // Llama a la ruta GET /api/users, que debe estar protegida por el rol 'admin'
             const response = await axios.get(API_URL, config); 
             
-            // Filtramos al usuario actual para que no pueda modificarse a sí mismo (opcional)
-            // Asumiendo que el objeto userData tiene un _id
             const filteredUsers = response.data.filter(user => user._id !== userData._id); 
             setUsers(filteredUsers);
             setError(null);
 
         } catch (err) {
-            // Manejar 401 (token fallido/expirado) o 403 (rol incorrecto)
             if (err.response && (err.response.status === 401 || err.response.status === 403)) {
                 handleAuthError();
             } else {
@@ -76,7 +128,6 @@ const AdminUserPanel = () => {
         }
     }, [adminToken, handleAuthError, userData]); 
 
-    // Cargar usuarios al montar el componente o cuando se requiera refrescar
     useEffect(() => {
         if (adminToken) {
             fetchUsers();
@@ -85,36 +136,30 @@ const AdminUserPanel = () => {
         }
     }, [fetchUsers, adminToken]);
     
-    // ... (El resto de la lógica de handleUpdateRole, handleDeleteUser y Modales permanece igual)
-    // El resto del componente...
-
-    // ==================================================
+    
     // ⬇️ LÓGICA DE MODIFICACIÓN DE ROL ⬇️
-    // ==================================================
     const handleUpdateRole = async (userId, newRole) => {
-        // 1. Mostrar modal de confirmación
         setModalState({
             isOpen: true,
             message: `¿Estás seguro de cambiar el rol del usuario ${userId.slice(-4)} a "${newRole}"?`,
             action: async () => {
-                // 2. Ejecutar la actualización después de la confirmación
-                setLoading(true);
                 setModalState({ isOpen: false, message: '', action: null, params: null });
 
                 try {
+                    setLoading(true);
                     const config = {
                         headers: {
                             'Authorization': `Bearer ${adminToken}`,
                         },
                     };
-                    
-                    await axios.put(`${API_URL}/${userId}`, { role: newRole }, config);
+                    const response = await axios.put(`${API_URL}/${userId}`, { role: newRole }, config);
 
-                    // 3. Actualizar el estado localmente
+                    const updatedUserRole = response.data.role || newRole; 
+
                     setUsers(users.map(user => 
-                        user._id === userId ? { ...user, role: newRole } : user
+                        user._id === userId ? { ...user, role: updatedUserRole } : user
                     ));
-                    setMessageModalState({ isOpen: true, message: `Rol de usuario ${userId.slice(-4)} actualizado a "${newRole}" con éxito.` });
+                    setMessageModalState({ isOpen: true, message: `Rol de usuario ${userId.slice(-4)} actualizado a "${updatedUserRole}" con éxito.` });
 
                 } catch (err) {
                     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
@@ -131,31 +176,70 @@ const AdminUserPanel = () => {
     };
 
     // ==================================================
-    // ⬇️ LÓGICA DE ELIMINACIÓN DE USUARIO ⬇️
+    // ⬇️ LÓGICA DE MODIFICACIÓN DE ESTATUS (ACTUALIZADA) ⬇️
     // ==================================================
-    const handleDeleteUser = async (userId) => {
-        // 1. Mostrar modal de confirmación
+    const handleUpdateStatus = async (userId, newStatus) => {
         setModalState({
             isOpen: true,
-            message: `⚠️ ¿Estás seguro de ELIMINAR al usuario ${userId.slice(-4)}? Esta acción es irreversible.`,
+            // 🎯 Usamos la función de utilidad para el mensaje de confirmación
+            message: `¿Estás seguro de cambiar el estado del usuario ${userId.slice(-4)} a "${getStatusLabel(newStatus).replace(/[^a-zA-ZáéíóúÁÉÍÓÚ\s]/g, '').trim()}"?`,
             action: async () => {
-                // 2. Ejecutar la eliminación después de la confirmación
-                setLoading(true);
                 setModalState({ isOpen: false, message: '', action: null, params: null });
-
+                
                 try {
+                    setLoading(true);
                     const config = {
                         headers: {
                             'Authorization': `Bearer ${adminToken}`,
                         },
                     };
                     
-                    await axios.delete(`${API_URL}/${userId}`, config);
+                    const response = await axios.put(`${API_URL}/${userId}`, { status: newStatus }, config);
 
-                    // 3. Actualizar el estado localmente
+                    // Corregido: Usar el 'status' de la respuesta o el 'newStatus'
+                    const updatedUserStatus = response.data.status || newStatus; 
+                    
+                    setUsers(users.map(user => 
+                        user._id === userId ? { ...user, status: updatedUserStatus } : user
+                    ));
+                    setMessageModalState({ 
+                        // 🎯 Usamos la función de utilidad para el mensaje de éxito
+                        isOpen: true, 
+                        message: `Estado de usuario ${userId.slice(-4)} actualizado a "${getStatusLabel(updatedUserStatus).replace(/[^a-zA-ZáéíóúÁÉÍÓÚ\s]/g, '').trim()}" con éxito.` 
+                    });
+
+                } catch (err) {
+                    if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+                        handleAuthError();
+                    } else {
+                        setMessageModalState({ isOpen: true, message: `Error al actualizar el estado: ${err.response?.data?.message || err.message}` });
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            },
+            params: { userId, newStatus }
+        });
+    };
+    
+    // ⬇️ LÓGICA DE ELIMINACIÓN DE USUARIO ⬇️
+    const handleDeleteUser = async (userId) => {
+        setModalState({
+            isOpen: true,
+            message: `⚠️ ¿Estás seguro de ELIMINAR al usuario ${userId.slice(-4)}? Esta acción es irreversible.`,
+            action: async () => {
+                setModalState({ isOpen: false, message: '', action: null, params: null });
+                
+                try {
+                    setLoading(true);
+                    const config = {
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                        },
+                    };
+                    await axios.delete(`${API_URL}/${userId}`, config);
                     setUsers(users.filter(user => user._id !== userId));
                     setMessageModalState({ isOpen: true, message: `Usuario ${userId.slice(-4)} eliminado con éxito.` });
-
                 } catch (err) {
                     if (err.response && (err.response.status === 401 || err.response.status === 403)) {
                         handleAuthError();
@@ -169,92 +253,88 @@ const AdminUserPanel = () => {
             params: { userId }
         });
     };
-    
-    // ==================================================
-    // ⬇️ RENDERING DE MODALES ⬇️
-    // ==================================================
-    const ConfirmationModal = ({ isOpen, message, onConfirm, onClose }) => {
-        if (!isOpen) return null;
-        return (
-            <div className="modal-overlay">
-                <div className="modal-content">
-                    <p>{message}</p>
-                    <div className="modal-actions">
-                        <button onClick={onConfirm} className="confirm-button">Confirmar</button>
-                        <button onClick={onClose} className="cancel-button">Cancelar</button>
-                    </div>
-                </div>
-            </div>
-        );
-    };
 
-    const MessageModal = ({ isOpen, message, onClose }) => {
-        if (!isOpen) return null;
-        return (
-            <div className="modal-overlay">
-                <div className="modal-content">
-                    <p>{message}</p>
-                    <button onClick={onClose} className="confirm-button">Aceptar</button>
-                </div>
-            </div>
-        );
-    };
 
     // ==================================================
     // ⬇️ RENDERING PRINCIPAL ⬇️
     // ==================================================
     return (
         <>
-            <ConfirmationModal
+            <ConfirmationModal 
                 isOpen={modalState.isOpen}
                 message={modalState.message}
                 onConfirm={modalState.action}
-                onClose={() => setModalState({ isOpen: false, message: '', action: null, params: null })}
+                onCancel={() => setModalState({ isOpen: false, message: '', action: null, params: null })}
             />
-            <MessageModal
+             <MessageModal 
                 isOpen={messageModalState.isOpen}
                 message={messageModalState.message}
                 onClose={() => setMessageModalState({ isOpen: false, message: '' })}
             />
+            
+            <div className="container">
+                {loading && (
+                    <div className="loading-spinner">
+                        <div className="spinner"></div>
+                        <p>Cargando usuarios...</p>
+                    </div>
+                )}
 
-            <div className="admin-user-panel p-6 bg-white rounded-lg shadow-xl">
-                <h3 className="text-2xl font-semibold mb-6 text-gray-800">Gestión de Usuarios</h3>
-
-                {loading && <div className="text-center py-4">Cargando usuarios...</div>}
-                {error && <div className="text-red-500 bg-red-100 p-3 rounded mb-4">{error}</div>}
+                {error && <div className="error-message">{error}</div>}
 
                 {!loading && !error && (
-                    <div className="overflow-x-auto">
-                        <div className="min-w-full">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="table-header">ID (últimos 4 dígitos)</th>
-                                        <th className="table-header">Nombre</th>
-                                        <th className="table-header">Email</th>
-                                        <th className="table-header">Rol</th>
-                                        <th className="table-header">Estado</th>
-                                        <th className="table-header">Acciones</th>
+                    <div className="panel">
+                        <div className="table-responsive">
+                            <table className="user-table">
+                                <thead>
+                                    <tr className="table-header">
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Usuario</th>
+                                        <th>Rol</th>
+                                        <th>Estado</th> 
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody>
                                     {users.map((user) => (
-                                        <tr key={user._id} className="hover:bg-gray-50">
-                                            <td className="table-cell font-mono text-xs">{user._id.slice(-4)}</td>
-                                            <td className="table-cell font-medium">{user.name}</td>
-                                            <td className="table-cell text-gray-500">{user.email}</td>
+                                        <tr key={user._id} className="table-row">
+                                            <td className="table-cell">{user.name}</td>
+                                            <td className="table-cell">{user.email}</td>
+                                            <td className="table-cell font-medium">{user.username}</td>
+                                            
+                                            {/* SELECT PARA EL ROL */}
                                             <td className="table-cell">
                                                 <select
                                                     value={user.role}
                                                     onChange={(e) => handleUpdateRole(user._id, e.target.value)}
-                                                    className="select-role"
+                                                    className="select-action"
                                                 >
-                                                    <option value="buyer">Comprador</option>
-                                                    <option value="seller">Vendedor</option>
-                                                    <option value="admin">Administrador</option>
+                                                    {ROLES.map(role => (
+                                                        <option key={role} value={role}>
+                                                            {role.charAt(0).toUpperCase() + role.slice(1)}
+                                                        </option>
+                                                    ))}
                                                 </select>
                                             </td>
-                                            <td className="table-cell text-gray-500">{user.status}</td>
+
+                                            {/* 🎯 SELECT PARA EL ESTADO (ACTUALIZADO) */}
+                                            <td className="table-cell">
+                                                <select
+                                                    // Usamos 'pending' como estado por defecto si no está definido (según tu modelo)
+                                                    value={user.status || 'pending'} 
+                                                    onChange={(e) => handleUpdateStatus(user._id, e.target.value)}
+                                                    // 🎯 Añadimos una clase dinámica para el color de fondo
+                                                    className={`select-action select-status-${user.status || 'pending'}`}
+                                                >
+                                                    {STATUSES.map(status => (
+                                                        <option key={status} value={status}>
+                                                            {getStatusLabel(status)}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </td>
+                                            
                                             <td className="table-cell font-medium">
                                                 <button
                                                     onClick={() => handleDeleteUser(user._id)}

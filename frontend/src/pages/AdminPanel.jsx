@@ -1,48 +1,50 @@
-// ELMAY-APP/frontend/src/pages/AdminPanel.jsx (MODIFICADO)
+// ELMAY-APP/frontend/src/pages/AdminPanel.jsx (REFACTORIZADO)
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
 import AdminUserPanel from '../components/AdminUserPanel';
-import Header from '../components/Header';
+// El Header ya está en App.jsx, se remueve
 
-function AdminPanel() {
+function AdminPanel({ user }) { 
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const checkAccessAndLoadUser = async () => {
+    let currentUser = user;
+    
+    // Si el usuario no se pasó como prop, lo cargamos de localStorage
+    if (!currentUser) {
         const userData = localStorage.getItem('user');
         if (!userData) {
             return navigate('/login');
         }
+        currentUser = JSON.parse(userData);
+    }
+    
+    // Verificamos el rol localmente
+    if (currentUser.role !== 'admin') {
+        navigate('/'); 
+    } else {
+        setIsAdmin(true);
+    }
 
-        const parsedUser = JSON.parse(userData);
-
-        // 1. Verificar acceso con una llamada a la API protegida
+    // Lógica para verificar acceso con llamada a la API protegida (por seguridad)
+    const checkAccess = async (token) => {
         try {
-            const token = parsedUser.token; 
-            
-            // Intentar acceder a la ruta del panel de administrador
             const response = await fetch('/api/users/admin', { 
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${token}`, 
                     'Content-Type': 'application/json',
                 },
             });
 
-            if (response.ok) {
-                // Acceso concedido por el backend (rol 'admin')
-                setUser(parsedUser);
-            } else if (response.status === 403) {
-                // Acceso denegado (rol incorrecto, no admin)
-                navigate('/'); // Redirigir a la página principal
+            if (response.status === 403) {
+                navigate('/'); // Acceso denegado (no admin)
             } else if (response.status === 401) {
-                // Token inválido o expirado
                 localStorage.removeItem('user');
                 navigate('/login');
-            } else {
-                // Otro error
+            } else if (!response.ok) {
                 throw new Error('Error al verificar el acceso al panel de admin');
             }
             
@@ -51,22 +53,22 @@ function AdminPanel() {
             navigate('/');
         }
     };
+    
+    if (currentUser && currentUser.token) {
+        checkAccess(currentUser.token);
+    }
 
-    checkAccessAndLoadUser();
-  }, [navigate]);
+  }, [navigate, user]); 
 
-  const onLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/'); // Redirige a la página principal pública al cerrar sesión
-  };
-
-  if (!user) {
+  if (!isAdmin) {
     return <div>Cargando...</div>;
   }
 
   return (
     <div className="admin-panel-container">
       <div className="admin-panel-card">
+        <h1>Panel de Administración</h1>
+        <p>Bienvenido, {user?.name}. Gestiona los roles y estados de los usuarios del sistema.</p>
         <AdminUserPanel/>
       </div>
     </div>
