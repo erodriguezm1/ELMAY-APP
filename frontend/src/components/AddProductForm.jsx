@@ -8,11 +8,9 @@ import axios from 'axios';
 const getUserData = () => {
     try {
         const userData = localStorage.getItem('user');
-        // Si userData existe, parseamos y devolvemos el objeto completo
         return userData ? JSON.parse(userData) : null;
     } catch (e) {
         console.error("Error al parsear el usuario de localStorage:", e);
-        // Opcional: Limpiar el almacenamiento local si el objeto está corrupto
         localStorage.removeItem('user'); 
         return null;
     }
@@ -36,32 +34,31 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
   const [loading, setLoading] = useState(false);
   const [productData, setProductData] = useState({
     name: '',
-    category: '', // Ahora es la categoría principal
-    subcategory: '', // Nuevo campo para la subcategoría
+    category: '', 
+    subcategory: '', 
     description: '',
     price: '',
     imageUrl: '',
     stock: '',
   });
   const [message, setMessage] = useState('');
+  // 🎯 NUEVO ESTADO: Para controlar la URL de vista previa
+  const [previewUrl, setPreviewUrl] = useState(''); 
 
-  // Si el modal no está abierto, no renderizamos nada para optimizar
   if (!isOpen) {
     return null;
   }
 
-  // Lógica para determinar subcategorías disponibles
   const availableSubcategories = SUBCATEGORIES_MAP[productData.category] || [];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Si se cambia la categoría principal, limpiamos la subcategoría
     if (name === 'category') {
       setProductData(prev => ({
         ...prev,
         category: value,
-        subcategory: '' // Resetear subcategoría
+        subcategory: '' 
       }));
     } else {
       setProductData(prev => ({
@@ -69,34 +66,43 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
         [name]: value,
       }));
     }
-  };
 
-  // 🟢 FUNCIÓN DE SUBMISIÓN CORREGIDA
+    // 🎯 Lógica para actualizar la vista previa de la imagen
+    if (name === 'imageUrl') {
+        setPreviewUrl(value);
+    }
+  };
+  
+  // 🎯 Manejo de error de carga de imagen para mostrar un mensaje si la URL falla
+  const handleImageError = (e) => {
+    // Si la imagen falla al cargar (URL no válida o rota), usamos un placeholder
+    e.target.onerror = null; // Evitar loop infinito
+    e.target.src = "https://via.placeholder.com/150?text=URL+Inv%C3%A1lida"; 
+    e.target.alt = "Imagen no disponible";
+  };
+  
+  // 🟢 FUNCIÓN DE SUBMISIÓN (Se mantiene sin cambios)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
 
-    // 🟢 1. OBTENER TOKEN DE FORMA CONSISTENTE
     const userData = getUserData();
     const token = userData?.token;
 
     if (!token) {
-        // 🔴 Manejar el error si no hay token (usuario no autenticado)
         setMessage('Error: No autorizado. Por favor, inicia sesión para añadir productos.');
         setLoading(false);
-        onClose(); // Cerrar el formulario si no hay token
+        onClose(); 
         return;
     }
 
-    // Validación básica de campos obligatorios
     if (!productData.name || !productData.category || !productData.description || !productData.price || !productData.imageUrl || !productData.stock) {
       setMessage('Error: Todos los campos son obligatorios.');
       setLoading(false);
       return;
     }
 
-    // Validación de subcategoría
     if (availableSubcategories.length > 0 && !productData.subcategory) {
         setMessage('Error: Selecciona una subcategoría para la categoría elegida.');
         setLoading(false);
@@ -104,35 +110,33 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
     }
     
     try {
-        // 🟢 2. INCLUIR EL TOKEN EN LOS HEADERS DE LA CONFIGURACIÓN
         const config = {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`, // ¡Añadido el token!
+                'Authorization': `Bearer ${token}`,
             },
         };
         
-        // Llamada a la API de creación de producto (asumiendo que es /api/products)
         const response = await axios.post('/api/products', productData, config);
 
         setMessage(`Producto "${response.data.name}" agregado con éxito!`);
         
-        // Limpiar el formulario
         setProductData({
             name: '', category: '', subcategory: '', description: '',
             price: '', imageUrl: '', stock: ''
         });
         
-        // Llamar a la función del padre para notificar la creación y actualizar la lista
+        // 🎯 Resetear también la URL de vista previa al crear el producto
+        setPreviewUrl(''); 
+
         if (onProductCreated) {
             onProductCreated(response.data);
         }
 
     } catch (error) {
-        // Manejo de error 401/403 (No autorizado/Acceso denegado)
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
             setMessage('Error: No tienes permiso o la sesión expiró. Vuelve a iniciar sesión.');
-            localStorage.removeItem('user'); // Limpiar token
+            localStorage.removeItem('user'); 
         } else {
             setMessage(`Error al agregar el producto: ${error.response?.data?.message || error.message}`);
         }
@@ -143,12 +147,12 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
 
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className="add-product-modal-overlay"> 
+      <div className="add-product-modal-content">
         <div className="add-product-form">
           <div className="form-header">
             <h2>Añadir Nuevo Producto</h2>
-            <button className="close-button" onClick={onClose}>&times;</button>
+            <button className="add-product-close-button" onClick={onClose}>&times;</button>
           </div>
           
           <form onSubmit={handleSubmit}>
@@ -164,26 +168,27 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
                 required
               />
             </div>
+            
+            {/* ESTRUCTURA DE FILA PARA CATEGORÍA Y SUBCATEGORÍA */}
+            <div className="form-row">
+                {/* CAMPO: CATEGORÍA PRINCIPAL */}
+                <div className="form-group">
+                    <label htmlFor="category">Categoría Principal</label>
+                    <select
+                        id="category"
+                        name="category"
+                        value={productData.category}
+                        onChange={handleInputChange}
+                        required
+                    >
+                        <option value="">Selecciona una Categoría</option>
+                        {MAIN_CATEGORIES.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                    </select>
+                </div>
 
-            {/* CAMPO: CATEGORÍA PRINCIPAL */}
-            <div className="form-group">
-                <label htmlFor="category">Categoría Principal</label>
-                <select
-                    id="category"
-                    name="category"
-                    value={productData.category}
-                    onChange={handleInputChange}
-                    required
-                >
-                    <option value="">Selecciona una Categoría</option>
-                    {MAIN_CATEGORIES.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                </select>
-            </div>
-
-            {/* CAMPO: SUBCATEGORÍA (CONDICIONAL) */}
-            {availableSubcategories.length > 0 && (
+                {/* CAMPO: SUBCATEGORÍA (CONDICIONAL) */}
                 <div className="form-group">
                     <label htmlFor="subcategory">Subcategoría</label>
                     <select
@@ -191,15 +196,18 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
                         name="subcategory"
                         value={productData.subcategory}
                         onChange={handleInputChange}
-                        required
+                        required={availableSubcategories.length > 0} 
+                        disabled={availableSubcategories.length === 0} 
                     >
-                        <option value="">Selecciona una Subcategoría</option>
+                        <option value="">
+                            {availableSubcategories.length > 0 ? 'Selecciona una Subcategoría' : 'N/A o Selecciona Categoría'}
+                        </option>
                         {availableSubcategories.map(sub => (
                             <option key={sub} value={sub}>{sub}</option>
                         ))}
                     </select>
                 </div>
-            )}
+            </div>
             
             {/* CAMPO: DESCRIPCIÓN */}
             <div className="form-group">
@@ -213,46 +221,67 @@ function AddProductForm({ isOpen, onClose, onProductCreated }) {
               />
             </div>
             
-            {/* CAMPO: PRECIO */}
-            <div className="form-group">
-              <label htmlFor="price">Precio</label>
-              <input
-                type="number"
-                id="price"
-                name="price"
-                value={productData.price}
-                onChange={handleInputChange}
-                required
-                min="0.01"
-                step="0.01"
-              />
+            {/* 🎯 NUEVA ESTRUCTURA DE FILA PARA URL DE IMAGEN Y VISTA PREVIA */}
+            <div className="form-row image-preview-row">
+                <div className="form-group image-url-input">
+                    <label htmlFor="imageUrl">URL de la Imagen</label>
+                    <input
+                        type="url"
+                        id="imageUrl"
+                        name="imageUrl"
+                        value={productData.imageUrl}
+                        onChange={handleInputChange}
+                        required
+                    />
+                </div>
+                
+                {/* 🎯 NUEVO: Contenedor de Vista Previa */}
+                <div className="image-preview-container">
+                    {previewUrl ? (
+                        <img 
+                            src={previewUrl} 
+                            alt="Vista previa del producto"
+                            className="image-preview"
+                            onError={handleImageError}
+                        />
+                    ) : (
+                        <div className="image-placeholder">
+                            Vista Previa (150x150)
+                        </div>
+                    )}
+                </div>
             </div>
-            
-            {/* CAMPO: URL DE IMAGEN */}
-            <div className="form-group">
-              <label htmlFor="imageUrl">URL de la Imagen</label>
-              <input
-                type="url"
-                id="imageUrl"
-                name="imageUrl"
-                value={productData.imageUrl}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            
-            {/* CAMPO: STOCK */}
-            <div className="form-group">
-              <label htmlFor="stock">Stock</label>
-              <input
-                type="number"
-                id="stock"
-                name="stock"
-                value={productData.stock}
-                onChange={handleInputChange}
-                required
-                min="0"
-              />
+
+            {/* ESTRUCTURA DE FILA PARA PRECIO Y STOCK */}
+            <div className="form-row">
+                {/* CAMPO: PRECIO */}
+                <div className="form-group">
+                    <label htmlFor="price">Precio</label>
+                    <input
+                        type="number"
+                        id="price"
+                        name="price"
+                        value={productData.price}
+                        onChange={handleInputChange}
+                        required
+                        min="0.01"
+                        step="0.01"
+                    />
+                </div>
+                
+                {/* CAMPO: STOCK */}
+                <div className="form-group">
+                    <label htmlFor="stock">Stock</label>
+                    <input
+                        type="number"
+                        id="stock"
+                        name="stock"
+                        value={productData.stock}
+                        onChange={handleInputChange}
+                        required
+                        min="0"
+                    />
+                </div>
             </div>
             
             <button

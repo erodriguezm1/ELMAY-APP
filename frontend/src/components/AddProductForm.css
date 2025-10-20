@@ -1,83 +1,238 @@
 /* ELMAY-APP/frontend/src/components/AddProductForm.css */
-.add-product-form {
-    margin-top: 2rem;
-    text-align: left;
+
+/* -------------------------------------------------------- */
+/* 🟢 VARIABLES DE DISEÑO (Mantenidas) */
+/* -------------------------------------------------------- */
+:root {
+    --primary-blue: #007bff; /* Azul vibrante (Acento) */
+    --primary-hover: #0056b3;
+    --text-dark: #333; /* Texto principal oscuro */
+    --text-light-gray: #6c757d;
+    --border-light: #ddd;
+    --success-green: #28a745;
+    --error-red: #dc3545;
+}
+
+/* -------------------------------------------------------- */
+/* 🟢 ESTILOS COMPACTOS (Columnas y Vista Previa) */
+/* -------------------------------------------------------- */
+
+/* Contenedor para agrupar campos en la misma línea */
+.form-row {
+    display: flex;
+    gap: 20px; 
+    margin-bottom: 1.2rem;
+}
+
+/* Asegura que cada campo dentro de la fila ocupe la mitad */
+.form-row .form-group {
+    flex: 1; 
+    margin-bottom: 0; 
+}
+
+/* 🎯 NUEVO: Estilos para la fila de URL y Vista Previa */
+.form-row.image-preview-row {
+    align-items: flex-end; /* Alinea los elementos inferiores (input vs preview) */
+    gap: 15px;
+}
+
+/* 🎯 NUEVO: El input de URL ocupa la mayor parte del espacio */
+.form-row.image-preview-row .image-url-input {
+    flex: 2; /* Ocupa 2/3 del espacio */
+    min-width: 0; /* Permite que el input se comprima correctamente */
+}
+
+/* 🎯 NUEVO: Contenedor de la vista previa */
+.image-preview-container {
+    flex: 1; /* Ocupa 1/3 del espacio */
+    height: 120px; /* Altura fija para el contenedor */
+    width: 100%; /* Ocupa todo su espacio asignado */
+    max-width: 150px; /* Limitar el ancho máximo de la vista previa */
+    border: 1px dashed var(--border-light);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+
+/* 🎯 NUEVO: Imagen de vista previa */
+.image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Asegura que la imagen se vea completa dentro del contenedor */
+    display: block;
+}
+
+/* 🎯 NUEVO: Placeholder cuando no hay URL */
+.image-placeholder {
+    text-align: center;
+    color: var(--text-light-gray);
+    font-size: 0.85rem;
+    padding: 10px;
+}
+
+/* -------------------------------------------------------- */
+/* 🟢 ESTILOS GENERALES (Mantenidos) */
+/* -------------------------------------------------------- */
+
+.add-product-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    overflow-y: auto; 
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; 
+    padding: 20px; 
+    box-sizing: border-box;
+}
+
+.add-product-modal-content {
+    background-color: #fff;
+    padding: 3rem; 
+    border-radius: 12px; 
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); 
+    width: 95%;
+    max-width: 700px; 
+    position: relative;
+    animation: fadeIn 0.3s ease-out;
+    margin: auto;
+    min-height: min-content;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
 }
 
 .add-product-form h2 {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    color: #333;
-    border-bottom: 2px solid #ddd;
+    font-size: 2rem;
+    color: var(--text-dark);
+    border-bottom: 2px solid var(--border-light);
     padding-bottom: 0.5rem;
+    flex-grow: 1;
 }
 
-.form-group {
-    margin-bottom: 1rem;
+.add-product-close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px; 
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 1;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-light-gray);
+    transition: color 0.2s;
+}
+
+.add-product-close-button:hover {
+    color: var(--error-red);
+}
+
+.form-group:not(.form-row .form-group) {
+    margin-bottom: 1.2rem;
 }
 
 .form-group label {
     display: block;
-    font-weight: bold;
+    font-weight: 600; 
     margin-bottom: 0.5rem;
-    color: #555;
+    color: var(--text-dark);
+    font-size: 1.05rem;
 }
 
-/* MODIFICACIÓN: Se añade .form-group select para estilizar los selectores */
 .form-group input,
 .form-group textarea,
 .form-group select {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 0.85rem 1rem; 
+    border: 1px solid var(--border-light);
+    border-radius: 8px; 
     box-sizing: border-box;
     font-size: 1rem;
-    transition: border-color 0.3s;
+    color: var(--text-dark);
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: #f9f9f9; 
 }
 
-/* MODIFICACIÓN: Se añade .form-group select:focus para los estilos de enfoque */
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); 
+    background-color: #fff;
+}
+
+.form-group select:disabled {
+    background-color: #eaeaea; 
+    cursor: not-allowed;
 }
 
 .submit-button {
     width: 100%;
-    padding: 0.75rem;
-    background-color: #007bff;
+    padding: 1rem;
+    background-color: var(--primary-blue);
     color: white;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: bold;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.1s;
+    margin-top: 1.5rem;
 }
 
 .submit-button:hover {
-    background-color: #0056b3;
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
 .submit-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+    transform: none;
 }
 
 .message {
-    margin-top: 1rem;
-    padding: 0.75rem;
-    border-radius: 5px;
-    font-weight: bold;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 600;
     text-align: center;
+    font-size: 1rem;
 }
 
 .success-message {
     background-color: #d4edda;
-    color: #155724;
+    color: var(--success-green);
     border: 1px solid #c3e6cb;
 }
 
@@ -87,55 +242,61 @@
     border: 1px solid #f5c6cb;
 }
 
-/* ESTILOS ESPECÍFICOS DEL MODAL */
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.75); /* Fondo semitransparente oscuro */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* Asegura que esté por encima de otros elementos */
-}
-
-.modal-content {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-    animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
+/* -------------------------------------------------------- */
+/* 🟢 RESPONSIVE: Adaptamos las filas a columnas en móvil */
+/* -------------------------------------------------------- */
+@media (max-width: 768px) {
+    
+    /* Las filas se convierten en columnas apiladas en móvil */
+    .form-row {
+        flex-direction: column;
+        gap: 0; 
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    /* Restaura el margen inferior a los grupos de formulario para que se separen */
+    .form-row .form-group {
+        margin-bottom: 1.2rem;
+    }
+    
+    /* 🎯 Ajuste específico para la fila de imagen en móvil */
+    .form-row.image-preview-row {
+        flex-direction: column; /* Apilar también en móvil */
+        align-items: stretch;
+    }
+
+    /* 🎯 En móvil, el contenedor de vista previa va debajo y es más ancho */
+    .image-preview-container {
+        width: 100%;
+        max-width: 100%; /* Ocupa el ancho completo */
+        height: 150px; /* Puede ser más alto en móvil */
+        margin-top: 5px;
+    }
+
+    /* Ajustes del modal (mantenidos) */
+    .add-product-modal-content {
+        padding: 1.5rem;
+        border-radius: 8px;
+        width: 100%;
+        max-width: none; 
+    }
+    
+    .add-product-form h2 {
+        font-size: 1.5rem;
+    }
+    
+    .add-product-close-button {
+        font-size: 2rem;
+        top: 10px;
+        right: 10px;
     }
 }
 
-.modal-close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 2rem;
-    font-weight: 300;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    color: #888;
-}
-
-.modal-close-button:hover {
-    color: #333;
+@media (max-width: 480px) {
+    .add-product-modal-content {
+        padding: 1rem;
+    }
+    
+    .add-product-form h2 {
+        font-size: 1.25rem;
+    }
 }

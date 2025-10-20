@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+// 🟢 IMPORTANTE: Importar el CSS asociado
+import './AdminProductActions.css'; 
 
 // Usamos la URL por defecto para la API. 
 const API_URL = '/api'; 
@@ -73,19 +75,29 @@ const AdminProductActions = ({ product, onUpdate }) => {
     };
 
     return (
-        <div className="admin-actions bg-gray-50 p-4 rounded-xl shadow-inner mt-4 border border-indigo-100">
-            <h4 className="text-lg font-semibold text-indigo-700 mb-3">
+        // 🎯 CLASE PRINCIPAL CORREGIDA
+        <div className="product-actions-container">
+            
+            <h4 className="action-title">
                 Acciones de Administración (Solo Admin)
             </h4>
             
-            {loading && <p className="text-sm text-yellow-600">Actualizando...</p>}
-            {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
-            {success && <p className="text-sm text-green-600 font-medium">{success}</p>}
+            {/* 🎯 Mostrar overlay de carga */}
+            {loading && (
+                <div className="loading-overlay">
+                    Actualizando...
+                </div>
+            )}
+            
+            {/* 🎯 Clases de mensaje corregidas */}
+            {error && <p className="message error-message">{error}</p>}
+            {success && <p className="message success-message">{success}</p>}
 
             {/* Selector de Status (active, suspended) */}
-            <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Estado del Producto:
+            {/* 🎯 Uso de action-group y status-group */}
+            <div className="action-group status-group">
+                <label className="status-label">
+                    Estado:
                 </label>
                 <select
                     value={currentStatus}
@@ -94,7 +106,7 @@ const AdminProductActions = ({ product, onUpdate }) => {
                         setCurrentStatus(newStatus);
                         handleUpdate('status', newStatus);
                     }}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                    className="status-select"
                     disabled={loading}
                 >
                     <option value="active">Activo (Visible)</option>
@@ -103,7 +115,8 @@ const AdminProductActions = ({ product, onUpdate }) => {
             </div>
 
             {/* Checkbox isOffer */}
-            <div className="flex items-center space-x-4 mb-2">
+            {/* 🎯 Uso de action-group y checkbox-group */}
+            <div className="action-group checkbox-group">
                 <input
                     type="checkbox"
                     id={`isOffer-${product._id}`}
@@ -113,16 +126,16 @@ const AdminProductActions = ({ product, onUpdate }) => {
                         setIsOfferChecked(isChecked);
                         handleUpdate('isOffer', isChecked);
                     }}
-                    className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                    className="checkbox-input"
                     disabled={loading}
                 />
-                <label htmlFor={`isOffer-${product._id}`} className="text-sm font-medium text-gray-700">
-                    Marcar como Oferta Destacada
+                <label htmlFor={`isOffer-${product._id}`} className="checkbox-label">
+                    Oferta Destacada
                 </label>
             </div>
 
             {/* Checkbox isMegaOffer */}
-            <div className="flex items-center space-x-4">
+            <div className="action-group checkbox-group">
                 <input
                     type="checkbox"
                     id={`isMegaOffer-${product._id}`}
@@ -132,11 +145,11 @@ const AdminProductActions = ({ product, onUpdate }) => {
                         setIsMegaOfferChecked(isChecked);
                         handleUpdate('isMegaOffer', isChecked);
                     }}
-                    className="h-4 w-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
+                    className="checkbox-input mega-offer-input"
                     disabled={loading}
                 />
-                <label htmlFor={`isMegaOffer-${product._id}`} className="text-sm font-medium text-gray-700">
-                    Marcar como Mega Oferta
+                <label htmlFor={`isMegaOffer-${product._id}`} className="checkbox-label">
+                    Mega Oferta
                 </label>
             </div>
         </div>
