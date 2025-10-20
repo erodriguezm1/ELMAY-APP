@@ -1,24 +1,183 @@
-footer {
-    background-color: #222;
-    color: #fff;
-    font-size: 14px;
-    bottom: 0;
-    position: fixed;
-    left: 0;
-    right: 0;
-    text-align: center;
-    z-index: 999;
+/* ELMAY-APP/frontend/src/components/Footer.css */
+
+/* -------------------------------------------------------- */
+/* 🟢 VARIABLES DE COLOR (Coherencia con Login.css) */
+/* -------------------------------------------------------- */
+:root {
+    --primary-blue: #007bff; 
+    --secondary-black: #222; 
+    --background-dark: #2c3e50; /* Un color oscuro más moderno para el footer */
+    --text-light: #eee; 
+    --text-link: #9bbdff; /* Azul claro para enlaces */
+    --heart-color: #dc3545; /* Rojo para el corazón */
 }
 
-footer p {
-    margin: 10px 0;
+/* -------------------------------------------------------- */
+/* 🟢 ESTRUCTURA PRINCIPAL DEL FOOTER (Anclado al contenido) */
+/* -------------------------------------------------------- */
+.main-footer {
+    /* IMPORTANTE: Quitamos position: fixed para que se ancle al final del contenido */
+    position: relative; 
+    width: 100%;
+    /* Fondo oscuro para contraste */
+    background-color: var(--background-dark); 
+    color: var(--text-light);
+    font-size: 1rem;
+    padding-top: 30px; 
+    z-index: 999; 
+    box-sizing: border-box;
+    border-top: 5px solid var(--primary-blue); /* Línea de acento */
 }
 
-footer i {
-    color: red;
+/* -------------------------------------------------------- */
+/* 🟢 CONTENIDO DE COLUMNAS (La parte que "se expande") */
+/* -------------------------------------------------------- */
+.footer-content-container {
+    display: flex;
+    justify-content: space-between;
+    /* Ancho máximo similar al del AdminPanel para consistencia */
+    max-width: 1200px; 
+    margin: 0 auto;
+    padding: 0 20px 30px 20px; /* Padding inferior para separar del copyright */
+    flex-wrap: wrap; /* Para que las columnas bajen en móvil */
 }
 
-footer a {
-    color: #3c97bf;
+.footer-section {
+    width: 30%; /* Tres columnas en escritorio */
+    min-width: 250px; /* Ancho mínimo para cada sección */
+    margin-bottom: 20px;
+    padding-right: 15px;
+    box-sizing: border-box;
+}
+
+.footer-section h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #fff; /* Títulos en blanco puro */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+.footer-section p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    color: var(--text-light);
+}
+
+.footer-section a {
+    color: var(--text-link);
     text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-section a:hover {
+    color: var(--primary-blue);
+    text-decoration: underline;
+}
+
+/* Lista de Enlaces */
+.links-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.links-section li {
+    margin-bottom: 8px;
+}
+
+.support-hours {
+    font-style: italic;
+    margin-top: 15px;
+    opacity: 0.8;
+}
+
+/* Enlaces Sociales */
+.social-links {
+    margin-top: 15px;
+    display: flex;
+    gap: 15px;
+}
+
+.social-links a {
+    color: var(--text-light);
+    font-size: 1.2rem;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.social-links a:hover {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: #fff;
+}
+
+
+/* -------------------------------------------------------- */
+/* 🟢 BARRA DE COPYRIGHT (Fondo) */
+/* -------------------------------------------------------- */
+.footer-bottom {
+    background-color: var(--secondary-black); /* Fondo más oscuro para la banda */
+    padding: 15px 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-bottom p {
+    margin: 5px 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.footer-bottom i.fa-heart {
+    color: var(--heart-color);
+}
+
+/* -------------------------------------------------------- */
+/* 🟢 RESPONSIVE (Ajuste para móviles y tabletas) */
+/* -------------------------------------------------------- */
+@media (max-width: 900px) {
+    /* Dos columnas en tabletas */
+    .footer-content-container {
+        justify-content: space-around;
+    }
+    .footer-section {
+        width: 45%; 
+        min-width: 300px;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Una columna en móviles */
+    .footer-content-container {
+        flex-direction: column;
+        align-items: center;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    .footer-section {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 25px;
+        padding-right: 0;
+    }
+    .footer-section h3 {
+        text-align: center;
+    }
+    .links-section ul {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .social-links {
+        justify-content: center;
+    }
 }

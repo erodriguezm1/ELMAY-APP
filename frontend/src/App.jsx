@@ -15,6 +15,13 @@ import PrivateRoute from './components/PrivateRoute.jsx';
 import SessionTimeout from './components/SessionTimeout';
 import MegaOfferModal from './components/MegaOfferModal.jsx';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faFacebookF, faTwitter, faInstagram, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons'; // Importa los iconos que necesites
+import { faHeart } from '@fortawesome/free-solid-svg-icons'; // Importa los iconos de sólidos que necesites
+
+// Añade los iconos a la librería global de Font Awesome
+library.add(faFacebookF, faTwitter, faInstagram, faGooglePlusG, faLinkedinIn, faHeart);
+
 function App() {
   const [user, setUser] = useState(null);
 

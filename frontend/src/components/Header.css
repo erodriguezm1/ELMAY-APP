@@ -193,6 +193,21 @@
     /* Separador muy sutil en gris más oscuro */
     border-bottom: 1px solid #444; 
 }
+
+/* -------------------------------------------------------- */
+/* 🟢 BOTÓN HAMBURGUESA (Menú Móvil) */
+/* -------------------------------------------------------- */
+.menu-toggle {
+    display: none; /* Por defecto oculto en escritorio */
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2em;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 101; /* Mayor que el menú, menor que el dropdown */
+}
+
 /* -------------------------------------------------------- */
 /* 🟢 RESPONSIVE (Móvil) */
 /* -------------------------------------------------------- */
@@ -202,18 +217,81 @@
         padding: 0 15px;
     }
     
+    /* HACEMOS VISIBLE EL BOTÓN DE MENÚ */
+    .menu-toggle {
+        display: block; 
+    }
+
+    /* OCULTAMOS LA NAVEGACIÓN EN PANTALLA COMPLETA EN MÓVIL POR DEFECTO (Menú lateral) */
+    .main-header nav {
+        position: fixed;
+        top: 65px; /* Altura del header en móvil */
+        right: 0;
+        width: 75%; /* Ancho del menú lateral */
+        max-width: 300px; /* Limitamos el ancho para pantallas muy grandes */
+        height: calc(100vh - 65px); /* Ocupa el resto de la pantalla */
+        background-color: #222; /* Mismo fondo que el header */
+        box-shadow: -4px 0 10px rgba(0,0,0,0.5);
+        transform: translateX(100%); /* Oculto fuera de la pantalla */
+        transition: transform 0.3s ease-in-out;
+        z-index: 99;
+        overflow-y: auto; /* Para menús largos */
+    }
+    
+    /* ESTADO ABIERTO DEL MENÚ MÓVIL */
+    .main-header nav.mobile-open {
+        transform: translateX(0); /* Lo movemos para que sea visible */
+    }
+
+    .main-header nav .ul-nav {
+        flex-direction: column; /* Apilamos los enlaces verticalmente */
+        align-items: flex-start; /* Alineamos a la izquierda */
+        padding: 20px 0;
+        gap: 0; /* Eliminamos el espacio horizontal */
+    }
+    
+    .main-header nav .ul-nav li {
+        width: 100%; /* El 'li' ocupa todo el ancho */
+    }
+
+    /* Ajustamos los enlaces para que funcionen como bloques de menú */
     .main-header nav .ul-nav li .a-nav,
     .main-header nav .ul-nav li .user-name,
     .main-header nav .ul-nav li .button-nav {
-        height: 65px;
-        line-height: 65px;
-        padding: 0 8px;
-        font-size: 0.95em;
+        height: auto; /* Altura automática */
+        line-height: normal;
+        padding: 15px 20px; /* Padding vertical más grande */
+        font-size: 1.1em;
+        width: 100%;
+        box-sizing: border-box; /* Asegura que el padding no desborde el ancho */
+        text-align: left;
+    }
+    
+    /* Hover más simple para móvil */
+    .main-header nav .ul-nav li .a-nav:hover,
+    .main-header nav .ul-nav li .user-name:hover,
+    .main-header nav .ul-nav li .button-nav:hover {
+        background: #333; /* Fondo más oscuro */
+        border-bottom: none; /* Quitamos el borde inferior que era para escritorio */
+        color: #007bff;
+    }
+    
+    /* Ajustes para el dropdown de usuario en el menú lateral */
+    .user-dropdown .user-name {
+        /* Se usa el estilo del a-nav en móvil */
+        height: auto;
+        line-height: normal;
     }
 
     .dropdown-menu {
-        top: 65px;
-        min-width: 160px;
+        /* Para el dropdown de usuario, lo hacemos de ancho completo en el menú lateral */
+        position: static; 
+        top: auto; 
+        width: 100%;
+        min-width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
     }
     
     .main-header .logo-header .site-desc {
@@ -221,13 +299,14 @@
     }
     
     .main-header nav .ul-nav li:first-child { 
-        display: none;
+        /* Si 'Inicio' está en el menú lateral, no debe ocultarse aquí */
+        /* display: none; */
     }
 
     /* Ajuste para el logo en móvil */
     .main-header .logo-header .logo {
-        height: 60px; 
-        padding: 4px 6px; /* Ajustamos el padding para móvil */
+        height: 50px; /* Reducir altura del logo */
+        padding: 4px 6px; 
         border-radius: 6px;
     }
 }

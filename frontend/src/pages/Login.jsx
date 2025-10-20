@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import './Login.css';
 import axios from 'axios'; 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // 🟢 FUNCIÓN DE VERIFICACIÓN DE SEGURIDAD
 const checkPasswordStrength = (password) => {
@@ -214,9 +215,9 @@ function Login() {
             <img src="../../static/index/image/logo-totalmente-transparente.png" alt="Logo ELMAY" className="form-logo" /> 
             <h1>Crear Cuenta</h1>
             <div className="social-container">
-              <a href="#" className="social"><i className="fab fa-facebook-f"></i></a>
-              <a href="#" className="social"><i className="fab fa-google-plus-g"></i></a>
-              <a href="#" className="social"><i className="fab fa-linkedin-in"></i></a>
+              <a href="#" className="social" role="button" aria-label="Registrarse con Google">
+                <FontAwesomeIcon icon={['fab', 'google-plus-g']} />
+              </a>
             </div>
             <span>o usa tu email para registrarte</span>
             
@@ -294,9 +295,9 @@ function Login() {
             <img src="../../static/index/image/logo-totalmente-transparente.png" alt="Logo ELMAY" className="form-logo" /> 
             <h1>Iniciar Sesión</h1>
             <div className="social-container">
-              <a href="#" className="social"><i className="fab fa-facebook-f"></i></a>
-              <a href="#" className="social"><i className="fab fa-google-plus-g"></i></a>
-              <a href="#" className="social"><i className="fab fa-linkedin-in"></i></a>
+              <a href="#" className="social" role="button" aria-label="Iniciar sesión con Google">
+                <FontAwesomeIcon icon={['fab', 'google-plus-g']} />
+              </a>
             </div>
             <span>o usa tu cuenta</span>
             
