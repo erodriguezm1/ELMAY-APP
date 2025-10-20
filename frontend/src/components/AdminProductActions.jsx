@@ -3,6 +3,7 @@ import axios from 'axios';
 import './AdminProductActions.css'; 
 // 🟢 IMPORTAR EL COMPONENTE DE EDICIÓN
 import EditProductForm from '../components/EditProductForm'; 
+import DetailProductForm from '../components/DetailProductForm';
 
 // ===============================================================
 // CONSTANTES PARA EL MANEJO DE ESTADOS (Sincronizado con el modelo)
@@ -41,6 +42,7 @@ const AdminProductActions = ({ product, onUpdate }) => {
     const [success, setSuccess] = useState('');
     // 🎯 NUEVO ESTADO: Controla la apertura del modal de edición
     const [isEditModalOpen, setIsEditModalOpen] = useState(false); 
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
 
     // Obtiene el token del objeto de usuario en localStorage
@@ -102,6 +104,26 @@ const AdminProductActions = ({ product, onUpdate }) => {
         setIsEditModalOpen(false); // Cierra el modal
     };
 
+    // 🎯 NUEVA FUNCIÓN: Abre el modal para crear/actualizar los detalles
+    const handleOpenDetailModal = () => {
+        setIsDetailModalOpen(true);
+        setError('');
+        setSuccess('');
+    };
+    // 🎯 NUEVA FUNCIÓN: Maneja la actualización de los detalles
+    // Esta función debe ser pasada al DetailProductForm, y se llama cuando el formulario guarda
+    const handleDetailUpdated = (updatedDetail) => {
+        // Asume que el backend devuelve el objeto ProductDetail.
+        // Aquí podrías hacer otra llamada a la API para obtener el producto completo con el nuevo 'details' virtual, 
+        // o simplemente cerrar el modal y mostrar un mensaje de éxito.
+        // Dado que la ruta de detalles *no* devuelve el Product completo, solo el Detail,
+        // confiaremos en un mensaje de éxito y cerraremos el modal.
+        setSuccess('Detalles avanzados actualizados con éxito.');
+        setIsDetailModalOpen(false);
+        // Si el onUpdate es muy importante, deberías llamar a una función que refetchee el Product aquí.
+        // onUpdate(product); // Esto forzará una recarga de los datos si el componente padre lo permite.
+    };
+
 
     return (
         <div className="product-actions-container">
@@ -117,6 +139,15 @@ const AdminProductActions = ({ product, onUpdate }) => {
                 disabled={loading}
             >
                 ✏️ Editar Producto
+            </button>
+
+            {/* 🎯 NUEVO BOTÓN: DETALLES AVANZADOS */}
+            <button 
+                onClick={handleOpenDetailModal}
+                className="action-button detail-button" // Usaremos una clase CSS diferente
+                disabled={loading}
+            >
+                ➕ Añadir/Editar Detalles Avanzados
             </button>
             
             {loading && (
@@ -196,6 +227,15 @@ const AdminProductActions = ({ product, onUpdate }) => {
                     onClose={() => setIsEditModalOpen(false)}
                     productToEdit={product}
                     onProductUpdated={handleProductEdited}
+                />
+            )}
+            {/* 🎯 RENDERIZADO CONDICIONAL DEL FORMULARIO DE DETALLES */}
+            {isDetailModalOpen && (
+                <DetailProductForm
+                    isOpen={isDetailModalOpen}
+                    onClose={() => setIsDetailModalOpen(false)}
+                    productId={product._id} // Necesita el ID para la ruta
+                    onDetailUpdated={handleDetailUpdated}
                 />
             )}
         </div>

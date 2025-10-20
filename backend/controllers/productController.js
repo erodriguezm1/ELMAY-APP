@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Product = require('../models/Product');
+const ProductDetail = require('../models/ProductDetail');
 
 // @desc    Crear un nuevo producto
 // @route   POST /api/products
@@ -182,10 +183,51 @@ const deleteProduct = asyncHandler(async (req, res) => {
     res.json({ message: 'Producto marcado como eliminado (soft delete) con éxito' });
 });
 
+// @desc    Crea o Actualiza los detalles avanzados de un producto
+// @route   POST /api/products/:id/details
+// @access  Private (Seller/Admin)
+const createOrUpdateProductDetail = asyncHandler(async (req, res) => {
+    const productId = req.params.id;
+    const { longDescription, additionalImages, specifications } = req.body;
+    
+    // 1. Verificación de Seguridad y Existencia del Producto
+    const product = await Product.findById(productId);
+    if (!product) {
+        res.status(404);
+        throw new Error('Producto principal no encontrado.');
+    }
+
+    // 2. Verificación de Permisos (Solo el dueño o un admin)
+    const isOwner = product.seller.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+    
+    if (!isOwner && !isAdmin) {
+        res.status(403); // Forbidden
+        throw new Error('No autorizado. Solo el vendedor original o un administrador pueden gestionar los detalles.');
+    }
+    
+    // 3. Crear o Actualizar usando findOneAndUpdate (Upsert)
+    // Buscamos un detalle que tenga la referencia a este producto
+    const detailData = { longDescription, additionalImages, specifications, product: productId };
+
+    const detail = await ProductDetail.findOneAndUpdate(
+        { product: productId }, // Criterio de búsqueda
+        { $set: detailData }, // Los datos a actualizar/insertar
+        { 
+            new: true, // Devuelve el documento después de la actualización
+            upsert: true, // CRÍTICO: Si no existe, lo crea
+            setDefaultsOnInsert: true // Aplica los valores por defecto si se crea
+        }
+    );
+
+    res.status(200).json(detail);
+});
+
 module.exports = {
     createProduct,
     getProducts,
     getProductById,
+    createOrUpdateProductDetail,
     getSellerProducts,
     updateProduct,
     deleteProduct

@@ -59,6 +59,16 @@ const productSchema = new mongoose.Schema({
   timestamps: true, // Agrega campos createdAt y updatedAt automáticamente
 });
 
+productSchema.virtual('details', {
+    ref: 'ProductDetail',        // Nombre del modelo al que hacemos referencia
+    localField: '_id',           // Campo en el modelo Product (su ID)
+    foreignField: 'product',     // Campo en el modelo ProductDetail que referencia al Product ID
+    justOne: true,               // Queremos un solo documento de detalle, no un arreglo
+});
+
+// Aseguramos que los Virtuals se incluyan cuando convertimos a JSON (necesario para la respuesta de la API)
+productSchema.set('toObject', { virtuals: true });
+productSchema.set('toJSON', { virtuals: true });
 // Creamos el modelo a partir del esquema
 const Product = mongoose.model('Product', productSchema);
 

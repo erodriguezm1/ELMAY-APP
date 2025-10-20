@@ -182,3 +182,14 @@
 .mega-offer-input {
     accent-color: var(--error-red); /* Color de acento para Mega Oferta */
 }
+
+.detail-button {
+    background-color: #ffc107; /* Un color de advertencia o secundario */
+    color: #333;
+    border: 1px solid #ffc107;
+}
+
+.detail-button:hover {
+    background-color: #e0a800;
+    transform: translateY(-1px);
+}

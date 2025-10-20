@@ -4,6 +4,7 @@ const {
     createProduct,
     getProducts,
     getProductById,
+    createOrUpdateProductDetail,
     getSellerProducts,
     updateProduct,
     deleteProduct
@@ -34,5 +35,10 @@ router.route('/:id')
     .get(getProductById)
     .put(protect, updateProduct)
     .delete(protect, deleteProduct);
+
+// @desc    Ruta para crear/actualizar los detalles avanzados de un producto
+// @route   POST /api/products/:id/details (Se puede usar PUT/PATCH, pero POST es común para upsert)
+// @access  Privado (Admin/Seller)
+router.post('/:id/details', protect, createOrUpdateProductDetail);
 
 module.exports = router;
