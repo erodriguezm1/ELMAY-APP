@@ -54,11 +54,6 @@ function Footer() {
         {/* Sección de Copyright (Barra Inferior) */}
         <div className="footer-bottom">
             <p>&copy; {new Date().getFullYear()} ELMAY. Todos los derechos reservados.</p>
-            <p>
-                {/* 🟢 CORRECCIÓN: Usar <FontAwesomeIcon> con el nombre del icono para 'solid' */}
-                Hecho con <FontAwesomeIcon icon="heart" /> por
-                <a target="_blank" rel="noopener noreferrer" href="https://florin-pop.com">Florin Pop</a>.
-            </p>
         </div>
     </footer>
   );
