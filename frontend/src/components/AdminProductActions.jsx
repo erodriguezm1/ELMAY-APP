@@ -1,24 +1,47 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-// 🟢 IMPORTANTE: Importar el CSS asociado
 import './AdminProductActions.css'; 
+// 🟢 IMPORTAR EL COMPONENTE DE EDICIÓN
+import EditProductForm from '../components/EditProductForm'; 
+
+// ===============================================================
+// CONSTANTES PARA EL MANEJO DE ESTADOS (Sincronizado con el modelo)
+// ===============================================================
+const PRODUCT_STATUSES = ['active', 'suspended', 'deleted'];
+
+// Función de utilidad para mostrar etiquetas amigables
+const getStatusLabel = (status) => {
+    switch (status) {
+        case 'active':
+            return '✅ Activo (Visible)';
+        case 'suspended':
+            return '⚠️ Suspendido (Oculto)';
+        case 'deleted':
+            return '🗑️ Eliminado (No Mostrar)';
+        default:
+            return 'Estado Desconocido';
+    }
+};
+// ===============================================================
 
 // Usamos la URL por defecto para la API. 
 const API_URL = '/api'; 
 
 const AdminProductActions = ({ product, onUpdate }) => {
-    // Verificar si el producto existe para evitar errores.
     if (!product) {
         return null; 
     }
     
-    // Inicializar estados de manera defensiva.
-    const [currentStatus, setCurrentStatus] = useState(product?.status || 'active');
+    // Inicializar estados
+    const [currentStatus, setCurrentStatus] = useState(product?.status || 'active'); 
     const [isOfferChecked, setIsOfferChecked] = useState(product?.isOffer || false);
     const [isMegaOfferChecked, setIsMegaOfferChecked] = useState(product?.isMegaOffer || false); 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    // 🎯 NUEVO ESTADO: Controla la apertura del modal de edición
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false); 
+
 
     // Obtiene el token del objeto de usuario en localStorage
     const getToken = () => {
@@ -57,13 +80,11 @@ const AdminProductActions = ({ product, onUpdate }) => {
                 config
             );
 
-            setSuccess(`Estado de '${field}' actualizado con éxito a ${value}.`);
-            // Llama a onUpdate para refrescar la lista en el componente padre
+            setSuccess(`'${field}' actualizado a: ${getStatusLabel(data.product[field]) || data.product[field]}.`);
             onUpdate(data.product); 
             
         } catch (err) {
             console.error('Error al actualizar el producto (Servidor):', err.response || err);
-            // Mensaje específico para el error 500, guiando al usuario a revisar su backend
             const errorMessage = err.response?.status === 500 
                 ? 'Error 500: Fallo interno del servidor. Revisa tu lógica de backend para la ruta PUT /api/products/:id.'
                 : err.response?.data?.message || 'Error al actualizar el producto.';
@@ -73,31 +94,44 @@ const AdminProductActions = ({ product, onUpdate }) => {
             setLoading(false);
         }
     };
+    
+    // 🎯 Función de manejo después de que el formulario de edición guarda los cambios
+    const handleProductEdited = (updatedProduct) => {
+        onUpdate(updatedProduct); // Refresca la lista en el componente padre
+        setSuccess('Producto editado con éxito.');
+        setIsEditModalOpen(false); // Cierra el modal
+    };
+
 
     return (
-        // 🎯 CLASE PRINCIPAL CORREGIDA
         <div className="product-actions-container">
             
             <h4 className="action-title">
                 Acciones de Administración (Solo Admin)
             </h4>
             
-            {/* 🎯 Mostrar overlay de carga */}
+            {/* 🎯 BOTÓN DE EDICIÓN */}
+            <button 
+                onClick={() => setIsEditModalOpen(true)}
+                className="action-button edit-button"
+                disabled={loading}
+            >
+                ✏️ Editar Producto
+            </button>
+            
             {loading && (
                 <div className="loading-overlay">
                     Actualizando...
                 </div>
             )}
             
-            {/* 🎯 Clases de mensaje corregidas */}
             {error && <p className="message error-message">{error}</p>}
             {success && <p className="message success-message">{success}</p>}
 
-            {/* Selector de Status (active, suspended) */}
-            {/* 🎯 Uso de action-group y status-group */}
+            {/* Selector de Status */}
             <div className="action-group status-group">
                 <label className="status-label">
-                    Estado:
+                    Estado del Producto:
                 </label>
                 <select
                     value={currentStatus}
@@ -109,13 +143,15 @@ const AdminProductActions = ({ product, onUpdate }) => {
                     className="status-select"
                     disabled={loading}
                 >
-                    <option value="active">Activo (Visible)</option>
-                    <option value="suspended">Suspendido (Oculto)</option>
+                    {PRODUCT_STATUSES.map(status => (
+                        <option key={status} value={status}>
+                            {getStatusLabel(status)}
+                        </option>
+                    ))}
                 </select>
             </div>
 
             {/* Checkbox isOffer */}
-            {/* 🎯 Uso de action-group y checkbox-group */}
             <div className="action-group checkbox-group">
                 <input
                     type="checkbox"
@@ -152,6 +188,16 @@ const AdminProductActions = ({ product, onUpdate }) => {
                     Mega Oferta
                 </label>
             </div>
+            
+            {/* 🎯 RENDERIZADO CONDICIONAL DEL FORMULARIO DE EDICIÓN */}
+            {isEditModalOpen && (
+                <EditProductForm
+                    isOpen={isEditModalOpen}
+                    onClose={() => setIsEditModalOpen(false)}
+                    productToEdit={product}
+                    onProductUpdated={handleProductEdited}
+                />
+            )}
         </div>
     );
 };

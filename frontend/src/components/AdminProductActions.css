@@ -33,11 +33,47 @@
 .action-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--primary-blue);
+    color: var(--text-dark); /* Color más neutro para el título */
     margin-bottom: 5px;
     padding-bottom: 5px;
     border-bottom: 2px solid #e9ecef;
 }
+
+/* -------------------------------------------------------- */
+/* 🟢 BOTÓN DE ACCIÓN (BASE) */
+/* -------------------------------------------------------- */
+.action-button {
+    width: 100%; /* Asegura que ocupe todo el ancho del contenedor */
+    padding: 10px 12px;
+    border-radius: 8px; /* Borde más suave */
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    border: none;
+    margin-top: 5px; /* Separación del título */
+    margin-bottom: 10px; /* Separación de las otras acciones */
+}
+
+/* 🎯 NUEVO ESTILO: BOTÓN EDITAR */
+.edit-button {
+    background-color: var(--primary-blue);
+    color: #ffffff;
+    border: 1px solid var(--primary-blue);
+}
+
+.edit-button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.action-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    color: #666;
+    transform: none;
+}
+
 
 /* -------------------------------------------------------- */
 /* 🟢 ESTILOS DE ESTADO Y MENSAJES */
@@ -145,36 +181,4 @@
 
 .mega-offer-input {
     accent-color: var(--error-red); /* Color de acento para Mega Oferta */
-}
-
-/* -------------------------------------------------------- */
-/* 🟢 BOTÓN (Mantenido) */
-/* -------------------------------------------------------- */
-.action-button {
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    border: none;
-}
-
-.edit-button {
-    background-color: var(--primary-blue);
-    color: #ffffff;
-    border: 1px solid var(--primary-blue);
-    margin-top: 10px; 
-}
-
-.edit-button:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-1px);
-}
-
-.edit-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-    color: #666;
-    transform: none;
 }
