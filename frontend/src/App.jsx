@@ -14,6 +14,7 @@ import SellerPanel from './pages/SellerPanel.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
 import SessionTimeout from './components/SessionTimeout';
 import MegaOfferModal from './components/MegaOfferModal.jsx';
+import ProductScreen from './screens/ProductScreen.jsx';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faFacebookF, faTwitter, faInstagram, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons'; // Importa los iconos que necesites
@@ -112,6 +113,12 @@ function App() {
               <PrivateRoute allowedRoles={['seller', 'admin']}>
                 <SellerPanel user={user} />
               </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/product/:id" 
+            element={
+              <ProductScreen />
             } 
           />
         </Routes>

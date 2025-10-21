@@ -1,0 +1,231 @@
+/* ELMAY-APP/frontend/src/screens/ProductScreen.css */
+/* -------------------------------------------------------- */
+/* 🟢 Botón de Retroceso */
+/* -------------------------------------------------------- */
+.back-button {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    margin-bottom: 25px; /* Separación del contenido */
+    display: inline-flex; /* Para que solo ocupe el espacio necesario */
+    align-items: center;
+    gap: 5px;
+}
+
+.back-button:hover {
+    background-color: #e0e0e0;
+    border-color: #a0a0a0;
+}
+
+/* -------------------------------------------------------- */
+/* 🟢 Contenedor Principal y Estilos Generales */
+/* -------------------------------------------------------- */
+
+.product-screen-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para las secciones */
+.product-screen-container section {
+    padding: 20px 0;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.product-screen-container h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #007bff; /* Acento de color primario */
+    display: inline-block;
+}
+
+/* -------------------------------------------------------- */
+/* 🟢 1. Sección Principal (Header) */
+/* -------------------------------------------------------- */
+
+.product-header-section {
+    display: flex;
+    gap: 40px;
+}
+
+.main-image-gallery {
+    flex: 1;
+    max-width: 50%;
+}
+
+.main-product-image {
+    width: 100%;
+    max-height: 500px;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.product-info-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 10px;
+}
+
+.product-summary {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.price-section {
+    margin-top: auto; /* Empuja los precios y el botón al final del panel */
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.price-tag {
+    font-size: 2rem;
+    color: #b12704; /* Color de precio de venta */
+    font-weight: 700;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.add-to-cart-button {
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    background-color: #ff9900;
+    color: #111;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-to-cart-button:hover {
+    background-color: #e68a00;
+}
+
+/* -------------------------------------------------------- */
+/* 🟢 2. Descripción Larga */
+/* -------------------------------------------------------- */
+
+.long-description-content p, 
+.long-description-content ul,
+.long-description-content ol {
+    margin-bottom: 15px;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #444;
+}
+
+/* -------------------------------------------------------- */
+/* 🟢 3. Especificaciones Técnicas */
+/* -------------------------------------------------------- */
+
+.specifications-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 2 a 3 columnas */
+    gap: 15px;
+}
+
+.specifications-list li {
+    background-color: #f7f7f7;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border-left: 4px solid #007bff;
+    font-size: 0.95rem;
+}
+
+.specifications-list strong {
+    display: block;
+    color: #333;
+    font-weight: 600;
+}
+
+/* -------------------------------------------------------- */
+/* 🟢 4. Galería Adicional */
+/* -------------------------------------------------------- */
+
+.additional-images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.additional-image-figure {
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.additional-image-figure img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+}
+
+.additional-image-figure figcaption {
+    padding: 8px;
+    font-size: 0.85rem;
+    color: #666;
+    background-color: #f9f9f9;
+}
+
+/* -------------------------------------------------------- */
+/* 🟢 Responsive (Móviles) */
+/* -------------------------------------------------------- */
+
+@media (max-width: 768px) {
+    .product-screen-container {
+        padding: 10px;
+        margin: 10px;
+    }
+
+    .product-header-section {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .main-image-gallery {
+        max-width: 100%;
+    }
+
+    .product-title {
+        font-size: 2rem;
+    }
+    
+    .price-tag {
+        font-size: 1.7rem;
+    }
+    
+    .specifications-list {
+        grid-template-columns: 1fr; /* Una sola columna en móvil */
+    }
+    
+    .additional-images-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}

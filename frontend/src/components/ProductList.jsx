@@ -1,7 +1,7 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import './ProductList.css';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate, Link } from "react-router-dom"; 
 import AdminProductActions from './AdminProductActions.jsx'; // Importamos el componente de acciones de administración
 
 // URL de la API
@@ -155,11 +155,11 @@ const ProductList = forwardRef((props, ref) => {
                 <div className="product-grid">
                     {products.map(product => (
                         <div key={product._id} className="product-card">
+                            <Link to={`/product/${product._id}`} className="product-card"></Link>
                             <img 
                                 src={product.imageUrl} 
                                 alt={product.name} 
                                 className="product-image" 
-                                onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/400x300/e0e0e0/555555?text=Imagen+No+Disp." }}
                             />
                             <div className="product-info">
                                 <h3>{product.name}</h3>
@@ -173,6 +173,9 @@ const ProductList = forwardRef((props, ref) => {
                                         {product.status?.toUpperCase()}
                                     </span>
                                 </div>
+                                <Link to={`/product/${product._id}`} className="view-details-button">
+                                    Ver Detalle Completo
+                                </Link>
                             </div>
                             
                             {/* INTEGRACIÓN DE ACCIONES DE ADMINISTRACIÓN */}
