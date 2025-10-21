@@ -309,4 +309,25 @@
         padding: 4px 6px; 
         border-radius: 6px;
     }
+    .cart-link {
+    position: relative; /* Para posicionar el badge */
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Separación entre el icono y la palabra Cesta */
+}
+
+.cart-badge {
+    position: absolute;
+    top: -10px; /* Ajusta la posición vertical */
+    right: -15px; /* Ajusta la posición horizontal */
+    background-color: #e74c3c; /* Rojo para el contador */
+    color: white;
+    border-radius: 50%;
+    padding: 2px 7px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    min-width: 20px;
+    text-align: center;
+}
 }

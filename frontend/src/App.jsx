@@ -15,6 +15,7 @@ import PrivateRoute from './components/PrivateRoute.jsx';
 import SessionTimeout from './components/SessionTimeout';
 import MegaOfferModal from './components/MegaOfferModal.jsx';
 import ProductScreen from './screens/ProductScreen.jsx';
+import CartScreen from './screens/CartScreen.jsx';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faFacebookF, faTwitter, faInstagram, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons'; // Importa los iconos que necesites
@@ -99,6 +100,15 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/product/:id" element={<ProductScreen />} />
+          <Route 
+            path="/cart" 
+            element={
+              <PrivateRoute allowedRoles={['buyer', 'seller', 'admin']}>
+                <CartScreen />
+              </PrivateRoute>
+            } 
+          />
           <Route 
             path="/admin" 
             element={

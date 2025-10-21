@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db'); // Importa la función de conexión
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 const cors = require('cors');
 
 // Cargar variables de entorno
@@ -26,6 +27,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
 
 // Usa las rutas de usuarios
 app.use('/api/users', userRoutes);
