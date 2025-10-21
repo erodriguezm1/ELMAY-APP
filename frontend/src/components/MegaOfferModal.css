@@ -1,7 +1,11 @@
 /* ELMAY-APP/frontend/src/components/MegaOfferModal.css */
 
+/* -------------------------------------------------------- */
+/* 🟢 CORRECCIÓN: Usamos un nombre específico para evitar conflictos */
+/* -------------------------------------------------------- */
+
 /* Estilos del contenedor principal (overlay) */
-.modal-overlay {
+.mega-offer-modal-overlay {
     position: fixed;
     inset: 0; /* Equivalente a top: 0; right: 0; bottom: 0; left: 0; */
     z-index: 50;
@@ -22,33 +26,51 @@
     
     /* CAMBIOS CLAVE: Más grande y con scroll si excede la altura */
     width: 95%; /* w-11/12, un poco más de margen */
-    max-width: 42rem; /* max-w-2xl para un buen ancho en escritorio */
-    max-height: 90vh; /* Ocupa un máximo del 90% del alto de la vista */
-    overflow-y: auto; /* Permite el scroll si el contenido es más alto que 90vh */
-    
+    max-width: 48rem; /* max-w-3xl, más ancho para las ofertas */
+    max-height: 90vh; /* Para que sea responsive y no se salga de la pantalla */
+    overflow-y: auto; /* Permite scroll si el contenido es demasiado largo */
     position: relative;
-    transform: scale(1); /* transform transition-transform duration-300 scale-100 */
-    transition: transform 0.3s ease-in-out;
+    animation: fadeInScale 0.3s ease-out forwards;
 }
 
-/* Estilos para el texto y productos dentro del modal */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
 
-.modal-content .main-title {
+.modal-title {
     font-size: 2.25rem; /* text-4xl */
     font-weight: 800; /* font-extrabold */
-    color: #dc2626; /* text-red-600 */
-    margin-bottom: 0.5rem; /* mb-2 */
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    color: #ef4444; /* text-red-500 */
+    text-align: center;
+    margin-bottom: 0.5rem;
 }
 
-.modal-content .description-text {
-    color: #4b5563; /* text-gray-700 */
-    margin-bottom: 1.5rem; /* mb-6 */
+.modal-subtitle {
     font-size: 1.125rem; /* text-lg */
+    color: #4b5563; /* text-gray-600 */
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
-/* Estilos para las tarjetas individuales de las ofertas */
-.offer-card {
+/* -------------------------------------------------------- */
+/* 🛒 OFERTAS Y LISTADO */
+/* -------------------------------------------------------- */
+
+.offers-list {
+    display: grid;
+    gap: 1.5rem; /* gap-6 */
+    /* Aseguramos que el grid tenga al menos una columna, idealmente 2 en desktop si hay espacio */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+}
+
+.offer-item {
     background-color: #fef2f2; /* bg-red-50 */
     padding: 1rem; /* p-4 */
     border-radius: 0.5rem; /* rounded-lg */
@@ -81,33 +103,62 @@
 .offer-info p {
     font-size: 0.875rem; /* text-sm */
     color: #4b5563; /* text-gray-600 */
-    /* line-clamp-2 (necesitaría un polyfill o configuración de Tailwind, pero se deja simple) */
+    /* Estilos para line-clamp-2 (si no usas Tailwind CSS para esto) */
     display: -webkit-box;
-    /*-webkit-line-clamp: 2;*/
-    -webkit-box-orient: vertical;  
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
+    text-overflow: ellipsis;
     margin-bottom: 0.5rem;
 }
 
 .offer-price-display {
     display: flex;
     align-items: baseline;
-    gap: 0.75rem; /* space-x-3 */
-    margin-top: 0.25rem;
+    gap: 0.5rem;
 }
 
-.offer-price-display .new-price {
-    font-size: 1.875rem; /* text-3xl */
-    font-weight: 900; /* font-black */
+.new-price {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 800; /* font-extrabold */
     color: #b91c1c; /* text-red-700 */
 }
 
-/* Animación para el título */
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
+.original-price {
+    font-size: 0.875rem; /* text-sm */
+    color: #9ca3af; /* text-gray-400 */
+    text-decoration: line-through;
+}
+
+/* -------------------------------------------------------- */
+/* 📱 RESPONSIVE (Móvil) */
+/* -------------------------------------------------------- */
+@media (max-width: 640px) {
+    .modal-content {
+        padding: 1.5rem; /* p-6 */
     }
-    50% {
-        opacity: .5;
+
+    .modal-title {
+        font-size: 1.75rem; /* text-3xl */
+    }
+
+    .offer-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .offer-image {
+        width: 4rem; 
+        height: 4rem; 
+        margin-bottom: 0.5rem;
+    }
+
+    .offer-info h3 {
+        font-size: 1.125rem; /* text-lg */
+    }
+
+    .new-price {
+        font-size: 1.25rem; /* text-xl */
     }
 }

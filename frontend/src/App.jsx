@@ -13,7 +13,6 @@ import AdminPanel from './pages/AdminPanel.jsx';
 import SellerPanel from './pages/SellerPanel.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
 import SessionTimeout from './components/SessionTimeout';
-import MegaOfferModal from './components/MegaOfferModal.jsx';
 import ProductScreen from './screens/ProductScreen.jsx';
 import CartScreen from './screens/CartScreen.jsx';
 
@@ -26,16 +25,6 @@ library.add(faFacebookF, faTwitter, faInstagram, faGooglePlusG, faLinkedinIn, fa
 
 function App() {
   const [user, setUser] = useState(null);
-
-  const [showMegaOffer, setShowMegaOffer] = useState(false);
-
-  // Datos de ejemplo para la mega oferta
-  const megaOffer = {
-    name: "Laptop Gamer Xtreme",
-    oldPrice: "1,500.00",
-    newPrice: "999.99",
-    image: "https://placehold.co/400x160/FEE2E2/DC2626?text=OFERTA+33%25+OFF"
-  };
 
   // 🟢 CORRECCIÓN: Función simplificada. La validación de expiración la hace el backend.
   const isTokenValid = (token) => {
@@ -78,19 +67,10 @@ function App() {
     setUser(null);
   };
 
-  // Función para cerrar el modal de la oferta
-  const handleCloseMegaOffer = () => {
-    setShowMegaOffer(false);
-  };
+ 
 
   return (
     <Router>
-      {/* 1. Modal de Mega Oferta (Visible si showMegaOffer es true) */}
-      <MegaOfferModal 
-        show={showMegaOffer} 
-        onClose={handleCloseMegaOffer} 
-        offerDetails={megaOffer}
-      />
       {/* NOTA: SessionTimeout debe usar el mismo estado 'user' si lo necesita */}
       <SessionTimeout user={user} onLogout={onLogout} /> 
       <div className="header-fixed-container"> 
@@ -98,7 +78,7 @@ function App() {
       </div>
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home/>} />
           <Route path="/login" element={<Login />} />
           <Route path="/product/:id" element={<ProductScreen />} />
           <Route 

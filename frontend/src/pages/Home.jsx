@@ -69,6 +69,15 @@ function Home() {
             setFeaturedOffers(data.filter(p => p.isOffer && !p.isMegaOffer).slice(0, 6)); 
             setMegaOffers(data.filter(p => p.isMegaOffer));
 
+            // 1. Capturamos las Mega Ofertas
+            const currentMegaOffers = data.filter(p => p.isMegaOffer);
+            setMegaOffers(currentMegaOffers);
+
+            // 2. 🟢 FIX CRÍTICO: Si hay Mega Ofertas, mostramos el modal.
+            if (currentMegaOffers.length > 0) {
+                setShowMegaOfferModal(true);
+            }
+
         } catch (err) {
             console.error("Error fetching products:", err);
             setError("No se pudieron cargar los productos. Inténtalo de nuevo más tarde.");
