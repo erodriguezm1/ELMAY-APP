@@ -48,7 +48,7 @@ const createProduct = asyncHandler(async (req, res) => {
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
     // CRITICAL FIX: Solo mostrar productos que estén 'active'.
-    const products = await Product.find({ status: 'active' }).populate('seller', 'name'); 
+    const products = await Product.find({ status: 'active' }).populate('seller', 'name').populate('details');; 
     res.status(200).json(products);
 });
 
@@ -56,7 +56,7 @@ const getProducts = asyncHandler(async (req, res) => {
 // @route   GET /api/products/:id
 // @access  Public
 const getProductById = asyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id).populate('seller', 'name');
+    const product = await Product.findById(req.params.id).populate('seller', 'name').populate('details');;
 
     // CRITICAL FIX: Si el producto está "deleted", se considera no encontrado para el público.
     if (product && product.status !== 'deleted') {

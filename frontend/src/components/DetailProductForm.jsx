@@ -1,10 +1,8 @@
-// ELMAY-APP/frontend/src/components/DetailProductForm.jsx (VERSION FINAL COMPLETA)
+// ELMAY-APP/frontend/src/components/DetailProductForm.jsx (VERSION FINAL COMPLETA Y CORREGIDA)
 
-import React, { useState, useEffect, useMemo } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactDOM from 'react-dom'; 
-import ReactQuill from 'react-quill'; // 🚨 Editor WYSIWYG
-import 'react-quill/dist/quill.snow.css'; // 🚨 Estilos del editor
 import './DetailProductForm.css';
 
 const API_URL = '/api';
@@ -14,11 +12,9 @@ const API_URL = '/api';
 // ===============================================================
 const listToJSON = (listString) => {
     const specs = {};
-    // Divide por salto de línea y filtra líneas vacías
     const lines = listString.split('\n').filter(line => line.trim() !== '');
 
     lines.forEach(line => {
-        // Busca la primera ocurrencia de ':' para separar la clave del valor
         const separatorIndex = line.indexOf(':');
         
         if (separatorIndex !== -1) {
@@ -26,7 +22,7 @@ const listToJSON = (listString) => {
             const value = line.substring(separatorIndex + 1).trim();
             
             if (key) {
-                // Normaliza la clave (ej: "memoria vram" -> "memoria_vram")
+                // Normalizamos la clave (ej: "memoria vram" -> "memoria_vram")
                 const normalizedKey = key.toLowerCase().replace(/\s+/g, '_');
                 specs[normalizedKey] = value;
             }
@@ -40,13 +36,14 @@ const listToJSON = (listString) => {
 const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
     // 1. Estados del Formulario
     const [longDescription, setLongDescription] = useState('');
-    const [specifications, setSpecifications] = useState(''); // Estado para la lista simple
+    // Almacena la lista en formato texto para el usuario.
+    const [specifications, setSpecifications] = useState(''); 
     const [additionalImages, setAdditionalImages] = useState([]); 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [fetchError, setFetchError] = useState('');
     
-    // Si el modal está cerrado, no renderizar nada (usando un Portal)
+    // Control de visibilidad del Modal (Portal)
     if (!isOpen) {
         return null;
     }
@@ -71,7 +68,7 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
                     setLongDescription(existingDetails.longDescription || '');
                     setAdditionalImages(existingDetails.additionalImages || []); 
 
-                    // 🚨 Convertir el objeto JSON de especificaciones de vuelta al formato de lista
+                    // Convertir el objeto JSON de especificaciones de vuelta al formato de lista
                     const specsObject = existingDetails.specifications || {};
                     const specsList = Object.entries(specsObject)
                         .map(([key, value]) => `${key}: ${value}`)
@@ -81,7 +78,8 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
                 } else {
                     setLongDescription('');
                     setSpecifications('');
-                    setAdditionalImages([{ url: '', caption: '' }]); // Inicializar con un campo vacío
+                    // Inicializar con un campo vacío si no hay imágenes existentes
+                    setAdditionalImages([{ url: '', caption: '' }]); 
                 }
             } catch (err) {
                 console.error('Error al cargar los detalles:', err.response || err);
@@ -94,9 +92,7 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
         fetchDetails();
     }, [productId]); 
 
-    // ===============================================================
-    // 🚨 4. Manejo de Imágenes Adicionales (CORREGIDO: DENTRO DEL COMPONENTE)
-    // ===============================================================
+    // 4. Manejo de Imágenes Adicionales
     const handleImageChange = (index, field, value) => {
         const newImages = [...additionalImages];
         newImages[index][field] = value;
@@ -111,22 +107,9 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
         const newImages = additionalImages.filter((_, i) => i !== index);
         setAdditionalImages(newImages);
     };
-    // ===============================================================
-
-    // 🚨 5. Configuración de la barra de herramientas de Quill
-    const modules = useMemo(() => ({
-        toolbar: [
-            [{ 'header': [1, 2, 3, false] }], 
-            ['bold', 'italic', 'underline', 'strike'], 
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }], 
-            [{ 'indent': '-1'}, { 'indent': '+1' }], 
-            ['link'], 
-            ['clean'] 
-        ],
-    }), []);
 
 
-    // 6. Función de Manejo de Envío
+    // 5. Función de Manejo de Envío
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -139,20 +122,16 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
             return;
         }
 
-        // 🚨 Convertir el texto de especificaciones al objeto JSON
+        // Convertir el texto de especificaciones al objeto JSON
         const specsObject = listToJSON(specifications);
         
         // Filtrar imágenes vacías antes de enviar
         const validAdditionalImages = additionalImages.filter(img => img.url.trim() !== '');
 
-        // Validación mínima para longDescription (Quill puede devolver un HTML vacío "<p><br></p>")
-        const isLongDescriptionEmpty = longDescription.trim() === '' || longDescription.trim() === '<p><br></p>';
-
         const detailData = {
-            // Si Quill devuelve código vacío, enviamos un string vacío
-            longDescription: isLongDescriptionEmpty ? '' : longDescription, 
+            longDescription: longDescription,
             additionalImages: validAdditionalImages, 
-            specifications: specsObject, // ¡Objeto JSON listo!
+            specifications: specsObject, 
         };
 
         try {
@@ -163,14 +142,13 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
                 },
             };
 
-            // Llamada al endpoint POST /api/products/:id/details que hace un UPSERT
             const { data } = await axios.post(
                 `${API_URL}/products/${productId}/details`,
                 detailData,
                 config
             );
             
-            onClose(); 
+            onClose(); // Cerrar al éxito
             onDetailUpdated(data); 
 
         } catch (err) {
@@ -182,7 +160,7 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
         }
     };
     
-    // 7. Renderizado del Modal usando un Portal
+    // 6. Renderizado del Modal usando un Portal
     return ReactDOM.createPortal(
         <div className="detail-overlay" onClick={onClose}>
             <div className="detail-modal-content" onClick={e => e.stopPropagation()}>
@@ -203,19 +181,19 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
                         <div className="form-loading">Cargando detalles...</div>
                     ) : (
                         <>
-                            {/* CAMPO: DESCRIPCIÓN LARGA (CON EDITOR WYSIWYG) */}
+                            {/* CAMPO: DESCRIPCIÓN LARGA (Reinsertado) */}
                             <div className="form-group">
-                                <label htmlFor="longDescription">Descripción Larga (Editor de Texto Enriquecido):</label>
-                                <ReactQuill 
-                                    theme="snow" 
-                                    value={longDescription} 
-                                    onChange={setLongDescription} 
-                                    modules={modules}
-                                    placeholder="Escribe aquí los detalles del producto. Usa los botones para dar formato (negritas, listas, etc.)."
+                                <label htmlFor="longDescription">Descripción Larga (HTML/Markdown opcional):</label>
+                                <textarea
+                                    id="longDescription"
+                                    value={longDescription}
+                                    onChange={(e) => setLongDescription(e.target.value)}
+                                    rows="6"
+                                    required
                                 />
                             </div>
 
-                            {/* SECCIÓN: IMÁGENES ADICIONALES */}
+                            {/* SECCIÓN: IMÁGENES ADICIONALES (Reinsertado) */}
                             <div className="form-group image-section">
                                 <label>Imágenes Adicionales ({additionalImages.length})</label>
                                 {additionalImages.map((image, index) => (
@@ -225,6 +203,8 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
                                             placeholder="URL de la imagen"
                                             value={image.url}
                                             onChange={(e) => handleImageChange(index, 'url', e.target.value)}
+                                            // Sólo se requiere si es el único campo y no está vacío
+                                            required={index === 0 && additionalImages.length === 1 && image.url.trim() === ''} 
                                         />
                                         <input
                                             type="text"
@@ -232,7 +212,6 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
                                             value={image.caption}
                                             onChange={(e) => handleImageChange(index, 'caption', e.target.value)}
                                         />
-                                        {/* Este es el botón que causaba el error */}
                                         <button 
                                             type="button" 
                                             onClick={() => handleRemoveImage(index)}
@@ -255,7 +234,7 @@ const DetailProductForm = ({ isOpen, onClose, productId, onDetailUpdated }) => {
                                     value={specifications}
                                     onChange={(e) => setSpecifications(e.target.value)}
                                     rows="8"
-                                    placeholder='Ejemplos:\npeso: 20kg\nmemoria vram: 8gb\nmaterial: Acero Inoxidable'
+                                    placeholder='Ejemplos:\npeso: 20kg\nmemoria vram: 8gb\nmaterial: Acero Inoxidable\ndimensiones: 10x20x30 cm'
                                 />
                                 <small className="json-hint">El formato debe ser **clave:valor**. Las claves se convertirán a minúsculas y se unirán con guión bajo (ej: 'memoria vram' &rarr; 'memoria_vram').</small>
                             </div>

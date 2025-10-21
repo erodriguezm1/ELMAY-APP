@@ -192,6 +192,7 @@
     font-size: 1.2rem;
     line-height: 1;
     transition: background-color 0.2s;
+    padding: 0;
 }
 
 .remove-image-button:hover {
@@ -213,20 +214,3 @@
     background-color: #1e7e34;
 }
 
-/* Estilos específicos para el editor Quill para que se ajuste al ancho */
-.ql-container {
-    border-radius: 0 0 6px 6px !important;
-    font-family: inherit;
-    min-height: 150px; /* Altura mínima para una buena experiencia de edición */
-}
-
-/* Ajuste del toolbar de Quill */
-.ql-toolbar {
-    border-radius: 6px 6px 0 0 !important;
-}
-
-/* Asegura que el contenedor del editor no se exceda */
-.form-group .ql-editor {
-    min-height: 150px;
-    padding: 12px 15px;
-}
