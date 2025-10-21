@@ -1,26 +1,19 @@
 /* ELMAY-APP/frontend/src/screens/ProductScreen.css */
-/* -------------------------------------------------------- */
-/* 🟢 Botón de Retroceso */
-/* -------------------------------------------------------- */
-.back-button {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
-    padding: 10px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-    margin-bottom: 25px; /* Separación del contenido */
-    display: inline-flex; /* Para que solo ocupe el espacio necesario */
-    align-items: center;
-    gap: 5px;
+/* ========================================================= */
+/* 🎨 PALETA DE COLORES Y FUENTES */
+/* ========================================================= */
+:root {
+    --color-primary: #3b5998; /* Azul corporativo */
+    --color-secondary: #ff9900; /* Naranja para acciones (Destacar) */
+    --color-text-dark: #2c3e50; /* Texto principal oscuro */
+    --color-text-light: #7f8c8d; /* Texto secundario gris */
+    --color-background-light: #f4f7f6; /* Fondo suave */
+    --font-stack: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-.back-button:hover {
-    background-color: #e0e0e0;
-    border-color: #a0a0a0;
+body {
+    font-family: var(--font-stack);
+    background-color: var(--color-background-light);
 }
 
 /* -------------------------------------------------------- */
@@ -29,11 +22,11 @@
 
 .product-screen-container {
     max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
+    margin: 30px auto;
+    padding: 30px;
     background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* Estilos para las secciones */
@@ -43,13 +36,40 @@
     border-bottom: 1px solid #eee;
 }
 
+/* Títulos de Sección */
 .product-screen-container h2 {
-    font-size: 1.8rem;
-    color: #333;
-    margin-bottom: 15px;
-    padding-bottom: 5px;
-    border-bottom: 2px solid #007bff; /* Acento de color primario */
+    font-size: 2rem;
+    color: var(--color-text-dark);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--color-primary);
     display: inline-block;
+    font-weight: 600;
+}
+
+/* -------------------------------------------------------- */
+/* 🟢 Botón de Retroceso (Volver) */
+/* -------------------------------------------------------- */
+.back-button {
+    background-color: var(--color-background-light);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    padding: 8px 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    margin-bottom: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.back-button:hover {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* -------------------------------------------------------- */
@@ -58,20 +78,21 @@
 
 .product-header-section {
     display: flex;
-    gap: 40px;
+    gap: 50px;
+    align-items: flex-start;
 }
 
 .main-image-gallery {
-    flex: 1;
-    max-width: 50%;
+    flex: 1.2;
+    max-width: 55%;
 }
 
 .main-product-image {
     width: 100%;
-    max-height: 500px;
+    max-height: 550px;
     object-fit: contain;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .product-info-panel {
@@ -81,85 +102,214 @@
 }
 
 .product-title {
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: 700;
-    color: #222;
-    margin-bottom: 10px;
+    color: var(--color-text-dark);
+    line-height: 1.1;
+    margin-bottom: 15px;
 }
 
 .product-summary {
-    color: #666;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 20px;
+    color: var(--color-text-light);
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin-bottom: 30px;
 }
 
+/* MODIFICADO: Contenedor de precio y controles */
 .price-section {
-    margin-top: auto; /* Empuja los precios y el botón al final del panel */
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+    margin-top: auto;
+    padding-top: 25px;
+    border-top: 2px dashed #ececec;
+    display: flex;
+    align-items: flex-end; /* Alineamos el precio con los controles */
+    justify-content: space-between;
+}
+
+/* 💡 NUEVOS ESTILOS: Precio Unitario y Total */
+.price-display {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.price-label {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    font-weight: 500;
 }
 
 .price-tag {
     font-size: 2rem;
-    color: #b12704; /* Color de precio de venta */
-    font-weight: 700;
-    display: block;
-    margin-bottom: 15px;
+    color: var(--color-text-dark);
+    font-weight: 600;
+    margin: 0;
 }
 
-.add-to-cart-button {
-    padding: 12px 25px;
+.total-price-tag {
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.total-label {
     font-size: 1.1rem;
-    background-color: #ff9900;
-    color: #111;
-    border: none;
-    border-radius: 8px;
+    color: var(--color-text-dark);
+    font-weight: 700;
+}
+
+.total-value {
+    font-size: 3rem; /* ¡Destacando el total! */
+    color: var(--color-secondary);
+    font-weight: 900;
+}
+
+
+/* 💡 NUEVOS ESTILOS: Controles de cantidad y botón */
+.add-to-cart-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 15px;
+}
+
+/* Estilos para el Selector de Cantidad con botones +/- */
+.quantity-selector-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+}
+
+.qty-btn {
+    background-color: var(--color-background-light);
+    color: var(--color-text-dark);
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    font-size: 1.2rem;
+    font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s;
+    width: 45px;
+    height: 45px;
+    /* Evita el highlight de selección en móvil */
+    -webkit-tap-highlight-color: transparent; 
+}
+
+.qty-btn:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.qty-btn:last-child {
+    border-radius: 0 8px 8px 0;
+}
+
+.qty-btn:hover:not(:disabled) {
+    background-color: #e0e0e0;
+}
+
+.qty-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.qty-input {
+    width: 60px;
+    padding: 10px 0;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    border-left: none;
+    border-right: none;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    -moz-appearance: textfield;
+    height: 45px;
+}
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Estilo para el botón de añadir al carrito (Prominente) */
+.add-to-cart-button {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    background-color: var(--color-secondary);
+    color: var(--color-text-dark);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: 0 4px 10px rgba(255, 153, 0, 0.4);
 }
 
 .add-to-cart-button:hover {
     background-color: #e68a00;
+    transform: translateY(-2px);
 }
 
 /* -------------------------------------------------------- */
 /* 🟢 2. Descripción Larga */
 /* -------------------------------------------------------- */
 
-.long-description-content p, 
+.long-description-content p,
 .long-description-content ul,
 .long-description-content ol {
-    margin-bottom: 15px;
-    font-size: 1rem;
-    line-height: 1.7;
-    color: #444;
+    margin-bottom: 18px;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--color-text-dark);
+}
+
+.long-description-content ul,
+.long-description-content ol {
+    padding-left: 20px;
 }
 
 /* -------------------------------------------------------- */
-/* 🟢 3. Especificaciones Técnicas */
+/* 🟢 3. Especificaciones Técnicas (Estilo de tarjeta) */
 /* -------------------------------------------------------- */
 
 .specifications-list {
     list-style: none;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 2 a 3 columnas */
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
 }
 
 .specifications-list li {
-    background-color: #f7f7f7;
-    padding: 10px 15px;
-    border-radius: 6px;
-    border-left: 4px solid #007bff;
-    font-size: 0.95rem;
+    background-color: #ffffff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .specifications-list strong {
-    display: block;
-    color: #333;
-    font-weight: 600;
+    color: var(--color-primary);
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.specifications-list span {
+    color: var(--color-text-dark);
+    font-weight: 400;
+    text-align: right;
 }
 
 /* -------------------------------------------------------- */
@@ -168,31 +318,47 @@
 
 .additional-images-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
 }
 
 .additional-image-figure {
     margin: 0;
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+.additional-image-figure:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .additional-image-figure img {
     width: 100%;
-    height: 150px;
+    height: 180px;
     object-fit: cover;
     display: block;
 }
 
 .additional-image-figure figcaption {
-    padding: 8px;
-    font-size: 0.85rem;
-    color: #666;
-    background-color: #f9f9f9;
+    padding: 10px;
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    background-color: var(--color-background-light);
 }
+
+/* -------------------------------------------------------- */
+/* 🟢 5. Comentarios (A futuro) */
+/* -------------------------------------------------------- */
+.reviews-section p {
+    color: var(--color-text-light);
+    font-style: italic;
+}
+
 
 /* -------------------------------------------------------- */
 /* 🟢 Responsive (Móviles) */
@@ -200,13 +366,13 @@
 
 @media (max-width: 768px) {
     .product-screen-container {
-        padding: 10px;
-        margin: 10px;
+        padding: 15px;
+        margin: 10px auto;
     }
 
     .product-header-section {
         flex-direction: column;
-        gap: 20px;
+        gap: 30px;
     }
 
     .main-image-gallery {
@@ -214,18 +380,51 @@
     }
 
     .product-title {
-        font-size: 2rem;
+        font-size: 2.2rem;
     }
-    
+
+    .price-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .price-display {
+        width: 100%;
+        align-items: flex-start;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+    }
+
     .price-tag {
-        font-size: 1.7rem;
+        font-size: 1.8rem;
     }
-    
+
+    .total-value {
+        font-size: 2.5rem;
+    }
+
+    .add-to-cart-controls {
+        width: 100%;
+        align-items: center; /* Centrar el control de cantidad y botón */
+    }
+
+    .quantity-selector-group {
+        width: 100%;
+        align-items: center;
+    }
+
+    .add-to-cart-button {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 1.1rem;
+    }
+
     .specifications-list {
-        grid-template-columns: 1fr; /* Una sola columna en móvil */
+        grid-template-columns: 1fr;
     }
-    
+
     .additional-images-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 }

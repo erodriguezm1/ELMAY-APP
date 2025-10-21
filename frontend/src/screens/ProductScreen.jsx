@@ -3,24 +3,29 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// import ReviewsSection from '../components/ReviewsSection'; // Lo harás más adelante
-import './ProductScreen.css'; // Crearás este CSS
+// import ReviewsSection from '../components/ReviewsSection'; // Componente de reseñas a futuro
+import './ProductScreen.css'; 
 
 const API_URL = '/api';
 
 const ProductScreen = () => {
-    // Obtener el ID del producto de la URL
+    // Hooks de React Router
     const navigate = useNavigate();
     const { id: productId } = useParams(); 
     
+    // Estados para la gestión de datos
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    
+    // ESTADO CLAVE: Cantidad a comprar (inicia en 1)
+    const [qty, setQty] = useState(1); 
 
+    // Hook para cargar los datos del producto
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                // Llama a la ruta que ahora pobla los 'details'
+                // Asume que esta ruta trae todos los detalles necesarios
                 const { data } = await axios.get(`${API_URL}/products/${productId}`);
                 setProduct(data);
                 setLoading(false);
@@ -36,10 +41,27 @@ const ProductScreen = () => {
         }
     }, [productId]);
 
+    // Función de navegación para volver atrás
     const goBack = () => {
         navigate(-1); 
     };
+    
+    // Función que maneja cambios directos en el input de cantidad
+    const handleQtyChange = (e) => {
+        // Asegura que el valor sea un número entero positivo, mínimo 1
+        const value = Math.max(1, parseInt(e.target.value, 10) || 1);
+        setQty(value);
+    };
+    
+    // Función que maneja la adición al carrito
+    const addToCartHandler = () => {
+        // Redirección simulada al carrito con los parámetros de ID y cantidad
+        navigate(`/cart/${productId}?qty=${qty}`);
+        console.log(`Añadiendo producto ${productId} con cantidad: ${qty} al carrito.`);
+    };
 
+
+    // Manejo de estados de UI
     if (loading) {
         return <div className="loading-screen">Cargando detalles del producto...</div>;
     }
@@ -52,11 +74,11 @@ const ProductScreen = () => {
         return <div className="error-screen">Producto no encontrado.</div>;
     }
     
-    // Extraer los detalles avanzados. Si no existen, usamos un objeto vacío.
-    // Recuerda que 'product.details' es el objeto ProductDetail completo.
+    // Desestructurar detalles y calcular el precio total
     const details = product.details || {}; 
+    const totalPrice = (product.price * qty).toFixed(2); // Calculado en tiempo real
 
-    // Función para renderizar especificaciones
+    // Función para renderizar especificaciones técnicas
     const renderSpecifications = (specs) => {
         if (!specs || Object.keys(specs).length === 0) {
             return <p>No hay especificaciones técnicas disponibles.</p>;
@@ -75,23 +97,76 @@ const ProductScreen = () => {
     return (
         <div className="product-screen-container">
             {/* 1. SECCIÓN PRINCIPAL: Imagen, Título, Precio y Resumen */}
-            {/* 💡 CLAVE 2: Botón de Retroceso */}
             <button onClick={goBack} className="back-button">
                 ← Volver a la Lista
             </button>
             <section className="product-header-section">
+                
+                {/* Panel de Imagen y Galería */}
                 <div className="main-image-gallery">
                     <img src={product.imageUrl} alt={product.name} className="main-product-image" />
-                    {/* Más imágenes adicionales aquí (si hay) */}
                 </div>
                 
+                {/* Panel de Información, Precios y Compra */}
                 <div className="product-info-panel">
                     <h1 className="product-title">{product.name}</h1>
                     <p className="product-summary">{product.description}</p>
+                    
                     <div className="price-section">
-                        <span className="price-tag">${product.price.toFixed(2)}</span>
-                        {/* Aquí puedes añadir lógica de stock, botones de compra, etc. */}
-                        <button className="add-to-cart-button">Añadir al Carrito</button>
+                        
+                        {/* Visualización de Precios (Unitario y Total) */}
+                        <div className="price-display">
+                            <span className="price-label">Precio Unitario:</span>
+                            <span className="price-tag">${product.price.toFixed(2)}</span>
+                            
+                            {/* Bloque del Total a Pagar (Destacado) */}
+                            <div className="total-price-tag">
+                                <span className="total-label">Total a Pagar:</span>
+                                <span className="total-value">${totalPrice}</span>
+                            </div>
+                        </div>
+
+                        {/* Controles de Cantidad y Botón de Carrito */}
+                        <div className="add-to-cart-controls">
+                            {/* Control de Cantidad con botones +/- */}
+                            <div className="quantity-selector-group">
+                                <label htmlFor="qty">Cantidad:</label>
+                                <div className="quantity-controls">
+                                    {/* Botón de Decremento */}
+                                    <button 
+                                        className="qty-btn" 
+                                        onClick={() => setQty(prev => Math.max(1, prev - 1))}
+                                        disabled={qty <= 1}
+                                    >
+                                        -
+                                    </button>
+                                    <input 
+                                        type="number" 
+                                        id="qty"
+                                        name="qty"
+                                        min="1"
+                                        value={qty}
+                                        onChange={handleQtyChange}
+                                        className="qty-input"
+                                    />
+                                    {/* Botón de Incremento */}
+                                    <button 
+                                        className="qty-btn" 
+                                        onClick={() => setQty(prev => prev + 1)}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {/* Botón de Agregar al Carrito */}
+                            <button 
+                                onClick={addToCartHandler} 
+                                className="add-to-cart-button"
+                            >
+                                Añadir al Carrito ({qty})
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -99,8 +174,7 @@ const ProductScreen = () => {
             {/* 2. SECCIÓN DE DESCRIPCIÓN LARGA */}
             <section className="description-section">
                 <h2>Descripción Detallada</h2>
-                {/* 🚨 PRECAUCIÓN: Renderizar HTML usando dangerouslySetInnerHTML */}
-                {/* Esto es necesario porque guardamos la descripción larga como un string HTML */}
+                {/* Renderizar HTML si existe (usar con precaución) */}
                 {details.longDescription ? (
                     <div 
                         className="long-description-content" 
