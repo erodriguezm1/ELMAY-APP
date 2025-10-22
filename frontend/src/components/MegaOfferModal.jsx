@@ -1,23 +1,18 @@
-import React, { useState, useEffect } from 'react'; // 👈 Importamos useState y useEffect
+import React, { useState, useEffect } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 import './MegaOfferModal.css';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// 👈 Añadimos íconos para las flechas de navegación
 import { faEye, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'; 
 
 const MegaOfferModal = ({ show, onClose, offers }) => {
   const navigate = useNavigate();
-  // Mostraremos todas las ofertas que vengan, no solo las 3 primeras.
-  // Pero si hay muchas, puedes limitar aquí: offers.slice(0, 5); por ejemplo.
   const offersToRender = offers; 
 
-  // 🟢 ESTADO PARA EL ÍNDICE DE LA OFERTA ACTUAL
+  // 🟢 HOOK 1: ESTADO PARA EL ÍNDICE (Debe estar aquí)
   const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
 
-  if (!show || offersToRender.length === 0) return null;
-
-  // 🟢 LÓGICA DE NAVEGACIÓN DEL CARRUSEL
+  // 🟢 LÓGICA DE NAVEGACIÓN MANUAL (Usa el estado normal, esto es seguro)
   const goToNextOffer = () => {
     setCurrentOfferIndex((prevIndex) => 
       (prevIndex + 1) % offersToRender.length
@@ -34,28 +29,29 @@ const MegaOfferModal = ({ show, onClose, offers }) => {
     setCurrentOfferIndex(index);
   };
 
-  // 🟢 EFECTO DE AUTO-AVANCE DEL CARRUSEL
+  // 🟢 HOOK 2: EFECTO DE AUTO-AVANCE DEL CARRUSEL (Debe estar aquí, antes del return)
   useEffect(() => {
     let interval;
-    if (show && offersToRender.length > 1) { // Solo si hay más de una oferta
+    if (show && offersToRender.length > 1) { 
       interval = setInterval(() => {
-        goToNextOffer();
-      }, 5000); // Cambiar cada 5 segundos (ajusta a tu gusto)
+        // Lógica de actualización de estado autónoma y estable
+        setCurrentOfferIndex((prevIndex) => 
+            (prevIndex + 1) % offersToRender.length
+        );
+      }, 5000); 
     }
 
-    // Limpieza del intervalo al desmontar o si el modal se cierra
+    // Limpieza, que se ejecuta correctamente al cambiar 'show' a false
     return () => {
       if (interval) {
         clearInterval(interval);
       }
     };
-  }, [show, offersToRender.length, goToNextOffer]); // Dependencias para re-ejecutar el efecto
+  // Dependencias estables
+  }, [show, offersToRender.length]); 
 
-  // Manejador para el botón "Ver Detalle"
-  const handleViewDetail = (productId) => {
-    onClose(); 
-    navigate(`/product/${productId}`);
-  };
+  // 🚨 FIX CLAVE: EL RETORNO CONDICIONAL VA DESPUÉS DE TODOS LOS HOOKS
+  if (!show || offersToRender.length === 0) return null; 
 
   // Obtenemos la oferta actual a mostrar
   const currentOffer = offersToRender[currentOfferIndex];
@@ -77,29 +73,33 @@ const MegaOfferModal = ({ show, onClose, offers }) => {
           &times;
         </button>
         
-        {/* 🟢 TÍTULO PRINCIPAL DEL MODAL - COMO EL DE STEAM */}
+        {/* 🟢 TÍTULO PRINCIPAL DEL MODAL */}
         <h2 className="main-modal-title">OFERTA DE ENTRE SEMANA</h2>
         
         {/* 🟢 CONTENEDOR DEL CARRUSEL DE OFERTAS */}
         <div className="carousel-container">
-          {/* 🟢 FLECHA IZQUIERDA */}
+          {/* FLECHAS... */}
           {offersToRender.length > 1 && (
-            <button onClick={goToPreviousOffer} className="carousel-nav-btn prev">
-              <FontAwesomeIcon icon={faChevronLeft} />
-            </button>
+            <>
+              <button onClick={goToPreviousOffer} className="carousel-nav-btn prev">
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
+              <button onClick={goToNextOffer} className="carousel-nav-btn next">
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
+            </>
           )}
 
-          {/* 🟢 LA OFERTA ACTUAL */}
+          {/* LA OFERTA ACTUAL */}
           {currentOffer && (
             <div key={currentOffer._id} className="carousel-item">
               <img 
                 src={currentOffer.imageUrl} 
                 alt={currentOffer.name} 
-                className="carousel-image" // Clase para la imagen grande
+                className="carousel-image" 
                 onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/600x300/FEE2E2/DC2626?text=OFERTA"; }}
               />
 
-              {/* 🟢 SECCIÓN DE TEXTO COMO LA DE STEAM */}
               <div className="carousel-text-content">
                 <h3 className="carousel-offer-title">{currentOffer.name}</h3>
                 <p className="carousel-offer-subtitle">{currentOffer.description}</p>
@@ -108,7 +108,6 @@ const MegaOfferModal = ({ show, onClose, offers }) => {
                 </p>
               </div>
 
-              {/* 🟢 BOTÓN MÁS INFORMACIÓN */}
               <button
                 onClick={() => handleViewDetail(currentOffer._id)}
                 className="carousel-info-button"
@@ -116,13 +115,6 @@ const MegaOfferModal = ({ show, onClose, offers }) => {
                 MÁS INFORMACIÓN
               </button>
             </div>
-          )}
-
-          {/* 🟢 FLECHA DERECHA */}
-          {offersToRender.length > 1 && (
-            <button onClick={goToNextOffer} className="carousel-nav-btn next">
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
           )}
         </div>
         
@@ -141,7 +133,7 @@ const MegaOfferModal = ({ show, onClose, offers }) => {
           </div>
         )}
 
-        {/* 🟢 BOTÓN CERRAR - Como el de Steam */}
+        {/* 🟢 BOTÓN CERRAR */}
         <button
           onClick={onClose}
           className="close-bottom-button"
