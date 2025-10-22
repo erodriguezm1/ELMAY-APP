@@ -25,6 +25,10 @@ const mainCategories = [
 // URL de la API (ajusta si es necesario)
 const API_URL = '/api/products/all'; 
 
+// ❌ ELIMINADAS: Las constantes de localStorage ya no son necesarias.
+// const MODAL_STORAGE_KEY = 'megaOfferModalShownTime';
+// const MODAL_RESHOW_INTERVAL = 24 * 60 * 60 * 1000; 
+
 function Home() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -67,15 +71,27 @@ function Home() {
             setPriceRange({ min: 0, max: currentMaxPrice });
 
             setFeaturedOffers(data.filter(p => p.isOffer && !p.isMegaOffer).slice(0, 6)); 
-            setMegaOffers(data.filter(p => p.isMegaOffer));
-
+            
             // 1. Capturamos las Mega Ofertas
             const currentMegaOffers = data.filter(p => p.isMegaOffer);
             setMegaOffers(currentMegaOffers);
 
-            // 2. 🟢 FIX CRÍTICO: Si hay Mega Ofertas, mostramos el modal.
+            // 🟢 [MODIFICACIÓN CLAVE] CONTROL DE SESIÓN CON sessionStorage
+            const MODAL_SESSION_KEY = 'megaOfferModalShownThisSession';
+
             if (currentMegaOffers.length > 0) {
-                setShowMegaOfferModal(true);
+                
+                // 1. Verificar si ya se mostró en ESTA sesión de navegación (sessionStorage).
+                const hasShownInSession = sessionStorage.getItem(MODAL_SESSION_KEY);
+                
+                if (!hasShownInSession) {
+                    
+                    setShowMegaOfferModal(true); 
+                    
+                    // 2. Marcar como mostrado para el resto de esta sesión.
+                    // Esto se borra automáticamente al cerrar la pestaña/navegador.
+                    sessionStorage.setItem(MODAL_SESSION_KEY, 'true');
+                }
             }
 
         } catch (err) {
@@ -143,10 +159,6 @@ function Home() {
         return categoryMatch && searchMatch && priceMatch;
     });
 
-    // 🎯 CAMBIO CLAVE: Eliminamos el filtro que excluía los featured offers
-    // Esto asegura que todos los productos que pasan el filtro de categoría (filteredProducts)
-    // se muestren en el centro, incluso si son ofertas destacadas.
-    // Consecuencia: los productos featured aparecerán en el centro Y en el sidebar derecho.
     const productsToDisplay = filteredProducts; 
     
     if (loading) {
